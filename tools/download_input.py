@@ -1,7 +1,7 @@
 from pathlib import Path
 import hashlib
 from tools.utils import list_obj_keys, get_s3_bits, save_image, save_file
-from tools.config import s3_client, BDRC_ARCHIVE_BUCKET, images_bucket, ocr_bucket
+from tools.config import s3_client, BDRC_ARCHIVE_BUCKET, OCR_OUTPUT_BUCKET, images_bucket, ocr_bucket
 
 
 def get_hash(work_id):
@@ -9,13 +9,13 @@ def get_hash(work_id):
     two = md5.hexdigest()[:2]
     return two
 
+
 def download_images(work_id, image_output_path):
     two = get_hash(work_id)
     output_path = Path(f"{image_output_path}/{work_id}")
     output_path.mkdir(parents=True, exist_ok=True)
     prefix = f"Works/{two}/{work_id}"
-    obj_keys = get_keys(work_id)
-    # obj_keys = list_obj_keys(prefix=prefix, s3_client=s3_client, bucket_name=BDRC_ARCHIVE_BUCKET)
+    obj_keys = list_obj_keys(prefix=prefix, s3_client=s3_client, bucket_name=BDRC_ARCHIVE_BUCKET)
     for obj_key in obj_keys:
         parts = obj_key.split("/")
         if parts[3] == "images":
@@ -27,12 +27,12 @@ def download_images(work_id, image_output_path):
 def download_OCR(work_id, OCR_output_path):
     two = get_hash(work_id)
     output_path = Path(f"{OCR_output_path}/{work_id}")
-    output_path.mkdir(parent=True, exist_ok=True)
-    prefix = f"Works/{two}/{work_id}"
+    output_path.mkdir(parents=True, exist_ok=True)
+    prefix = f"Works/{two}/{work_id}/vision"
     obj_keys = list_obj_keys(prefix=prefix, s3_client=s3_client, bucket_name=BDRC_ARCHIVE_BUCKET)
     for obj_key in obj_keys:
         parts = obj_key.split("/")
-        if parts[3] == "images-web":
+        if parts[5] == "output":
             filebits = get_s3_bits(obj_key, ocr_bucket)
             filename = parts[-1]
             save_file(filebits, filename, output_path)
@@ -40,13 +40,14 @@ def download_OCR(work_id, OCR_output_path):
 def get_keys(work_id):
     s3_keys = []
     two = get_hash(work_id)
-    prefix = f"Works/{two}/{work_id}"
-    obj_keys = list_obj_keys(prefix=prefix, s3_client=s3_client, bucket_name=BDRC_ARCHIVE_BUCKET)
+    prefix = f"Works/{two}/{work_id}/vision"
+    obj_keys = list_obj_keys(prefix=prefix, s3_client=s3_client, bucket_name=OCR_OUTPUT_BUCKET)
     for obj_key in obj_keys:
         parts = obj_key.split("/")
-        if parts[3] == "images":
-            if parts[4] == "W1KG13126-I1KG13170":
-                s3_keys.append(obj_key)
+        if len(parts) > 6:
+            if parts[5] == "output":
+                if parts[6] == "W1KG13126-I1KG13170":
+                    s3_keys.append(obj_key)
     return s3_keys
 
 

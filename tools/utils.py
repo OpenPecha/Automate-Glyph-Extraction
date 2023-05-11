@@ -2,6 +2,7 @@ import io
 import botocore
 from PIL import Image as PillowImage
 from pathlib import Path
+from wand.image import Image as WandImage
 
 
 def crop_image(source_image_path, vertices):
@@ -36,8 +37,8 @@ def list_obj_keys(prefix, s3_client, bucket_name):
         continuation_token = response.get("NextContinuationToken")
         if not continuation_token:
             break
-        if str(len(obj_keys)) == "3000":
-            break
+        # if str(len(obj_keys)) == "10000":
+        #     break
     return obj_keys
 
 
@@ -49,6 +50,18 @@ def get_s3_bits(s3_key, s3_bucket):
     except botocore.exceptions.ClientError as error:
         return
 
+def save_with_wand(bits, output_fn):
+    try:
+        with WandImage(blob=bits.getvalue()) as img:
+            img.format = "png"
+            img.save(filename=str(output_fn))
+    except Exception as e:
+        return
+
+
+def _binarize(img, th=127):
+    return img.convert("L").point(lambda x: 255 if x > th else 0, mode='1')
+
 
 def save_image(bits, filename, output_path):
     output_fn = output_path / filename
@@ -58,9 +71,16 @@ def save_image(bits, filename, output_path):
         return
     try:
         img = PillowImage.open(bits)
+    except Exception as e:
+        if bits.getvalue():
+            save_with_wand(bits, output_fn)
+        return
+
+    try:
         img.save(str(output_fn))
     except:
-        return
+        del img
+        save_with_wand(bits, output_fn)
     
 
 def save_file(bits, filename, output_path):
