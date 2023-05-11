@@ -5,6 +5,8 @@ setup(
     version="0.0.1",
     packages=find_packages(),
     install_requires=[
-        "Pillow>=8.4.0, <9.0",
+        "Pillow>=8.4.0,<9.0",
+        "boto3>=1.24.50, <2.0",
+        ""
     ],
 )

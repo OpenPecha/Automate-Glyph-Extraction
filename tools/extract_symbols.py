@@ -61,7 +61,7 @@ def extract_symbols(ocr_paths, source_dir_path, output_image_path):
             cropped_image.save(f"{output_path}/{image_name}.jpg")
 
 if __name__ == "__main__":
-    work_id = "W1KG13126"
+    work_id = "མིའི་རིགས་ཀྱི་ལོ་རྒྱུས་སྙིང་བསྡུས།"
     ocr_path = Path(f"./data/ocr_output/{work_id}")
     source_image_path = Path(f"./data/source_images/{work_id}")
     output_image_path = Path(f"./data/cropped_image/")

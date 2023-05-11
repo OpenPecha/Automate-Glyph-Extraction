@@ -1,7 +1,0 @@
-README.md
-setup.py
-extract_glyphs.egg-info/PKG-INFO
-extract_glyphs.egg-info/SOURCES.txt
-extract_glyphs.egg-info/dependency_links.txt
-extract_glyphs.egg-info/requires.txt
-extract_glyphs.egg-info/top_level.txt
