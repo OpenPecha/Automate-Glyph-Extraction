@@ -2,10 +2,10 @@ import io
 import botocore
 from PIL import Image as PillowImage
 from pathlib import Path
-from wand.image import Image as WandImage
+# from wand.image import Image as WandImage
 
 
-def crop_image(source_image_path, vertices):
+def crop_image(source_image_path, vertices, rotate_image=False):
     image = PillowImage.open(source_image_path)
 
     x0, y0 = vertices[0]['x'], vertices[0]['y']
@@ -18,9 +18,32 @@ def crop_image(source_image_path, vertices):
     right = max(x0, x1, x2, x3)
     bottom = max(y0, y1, y2, y3)
 
-    cropped_image = image.crop((left, top, right, bottom))
-    return cropped_image
+    width = right - left
+    height = bottom - top
 
+    expand_percentage = 0.2
+    expand_width = int(width * expand_percentage)
+    expand_height = int(height * expand_percentage)
+
+    expanded_left = max(left - expand_width, 0)
+    expanded_top = max(top - expand_height, 0)
+    expanded_right = right + expand_width
+    expanded_bottom = bottom + expand_height
+
+    expanded_height = expanded_bottom - expanded_top
+
+    expand_bottom_percentage = 0.3
+    expand_bottom_height = int(expanded_height * expand_bottom_percentage)
+    expanded_bottom = bottom + expand_bottom_height
+
+    cropped_image = image.crop((expanded_left, expanded_top, expanded_right, expanded_bottom))
+    if rotate_image:
+        rotated_image = cropped_image.rotate(270, expand=True)
+        final_image = rotated_image
+    else:
+        final_image = cropped_image
+
+    return final_image
 
 def list_obj_keys(prefix, s3_client, bucket_name):
     obj_keys = []
@@ -37,8 +60,7 @@ def list_obj_keys(prefix, s3_client, bucket_name):
         continuation_token = response.get("NextContinuationToken")
         if not continuation_token:
             break
-        # if str(len(obj_keys)) == "10000":
-        #     break
+        
     return obj_keys
 
 
