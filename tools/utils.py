@@ -2,10 +2,23 @@ import io
 import botocore
 from PIL import Image as PillowImage
 from pathlib import Path
+import hashlib
 # from wand.image import Image as WandImage
 
+def get_hash(work_id):
+    md5 = hashlib.md5(str.encode(work_id))
+    two = md5.hexdigest()[:2]
+    return two
 
-def crop_image(source_image_path, vertices, rotate_image=False):
+def get_image_name_for_sentence_image(source_image_path, joined_box):
+    image_name = source_image_path.stem
+    first_vertex = str(joined_box[0]["x"]) + str(joined_box[0]["y"])
+    last_vertex = str(joined_box[3]["x"]) + str(joined_box[3]["y"])
+    line_image_name = image_name + "_" + first_vertex + "_" + last_vertex
+    return line_image_name
+
+
+def crop_image(source_image_path, vertices, expand_percentage=1.5):
     image = PillowImage.open(source_image_path)
 
     x0, y0 = vertices[0]['x'], vertices[0]['y']
@@ -21,29 +34,18 @@ def crop_image(source_image_path, vertices, rotate_image=False):
     width = right - left
     height = bottom - top
 
-    expand_percentage = 0.2
-    expand_width = int(width * expand_percentage)
-    expand_height = int(height * expand_percentage)
+    expand_amount = int(expand_percentage * width)
 
-    expanded_left = max(left - expand_width, 0)
-    expanded_top = max(top - expand_height, 0)
-    expanded_right = right + expand_width
-    expanded_bottom = bottom + expand_height
+    expanded_left = max(left - expand_amount, 0)
+    expanded_top = max(top - expand_amount, 0)
+    expanded_right = min(right + expand_amount, image.width)
+    expanded_bottom = min(bottom + expand_amount, image.height)
 
-    expanded_height = expanded_bottom - expanded_top
+    expanded_image = image.crop((expanded_left, expanded_top, expanded_right, expanded_bottom))
 
-    expand_bottom_percentage = 0.3
-    expand_bottom_height = int(expanded_height * expand_bottom_percentage)
-    expanded_bottom = bottom + expand_bottom_height
+    return expanded_image
 
-    cropped_image = image.crop((expanded_left, expanded_top, expanded_right, expanded_bottom))
-    if rotate_image:
-        rotated_image = cropped_image.rotate(270, expand=True)
-        final_image = rotated_image
-    else:
-        final_image = cropped_image
 
-    return final_image
 
 def list_obj_keys(prefix, s3_client, bucket_name):
     obj_keys = []
@@ -74,7 +76,7 @@ def get_s3_bits(s3_key, s3_bucket):
 
 def save_with_wand(bits, output_fn):
     try:
-        with WandImage(blob=bits.getvalue()) as img:
+         with WandImage(blob=bits.getvalue()) as img:
             img.format = "png"
             img.save(filename=str(output_fn))
     except Exception as e:
@@ -110,3 +112,10 @@ def save_file(bits, filename, output_path):
     if output_fn.is_file():
         return
     output_fn.write_bytes(bits.getvalue())
+
+def is_archived(s3_key, s3_client, Bucket):
+    try:
+        s3_client.head_object(Bucket=Bucket, Key=s3_key)
+    except botocore.errorfactory.ClientError:
+        return False
+    return True
