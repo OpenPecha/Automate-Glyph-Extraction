@@ -3,11 +3,10 @@ import gzip
 import re
 from openpecha.utils import load_yaml
 from pathlib import Path
-from utils import crop_image
+from utils import crop_and_resize, pre_process_image
 
+essential_list = Path(f"./data/tibetan_essential_list.txt").read_text().split("\n")
 
-def is_symbol(text):
-    return True
 
 def get_bounding_poly_for_symbol(ocr_path):
     curr = []
@@ -51,17 +50,9 @@ def get_source_image_path(ocr_path, source_dir_path):
         image_name = image_path.stem
         if filename == image_name:
             return image_path
-        
-def create_ocr_paths_order(tengyur_images_yml):
-    ocr_paths_order = []
-    for image_key in tengyur_images_yml:
-        image_name = (image_key.split("/")[-1]).split(".")[0]
-        ocr_path = Path(f"./data/ocr_output/images_tengyur_pecing/{image_name}.json.gz")
-        ocr_paths_order.append(ocr_path)
-    return ocr_paths_order
 
 
-def extract_symbols(ocr_paths, source_dir_path, output_image_path, ):
+def extract_symbols(ocr_paths, source_dir_path, output_image_path, done_list):
     for num, ocr_path in enumerate(ocr_paths, 1):
         print(num)
         source_image_path = get_source_image_path(ocr_path, source_dir_path)
@@ -70,28 +61,34 @@ def extract_symbols(ocr_paths, source_dir_path, output_image_path, ):
             continue
         for value in bounding_polys:
             text = value[0]['text']
+            if text in done_list:
+                continue
             vertices = value[0]['vertices']
             output_path = Path(f"{output_image_path}/{text}")
-            if text in [".", "/", "_", "-", "(", ")", ",", "&", ":", "}", "{", "»", "—",
-                     "@", "[", "]", "-", "+", "=", "་", "\\", "*", "༌", "∶", "$", "|"]:
-                continue
-            elif re.match(r"[a-zA-Z0-9\u4e00-\u9fff\u0c80-\u0cff\u0900-\u097F]", text):
-                continue
-            output_path.mkdir(parents=True, exist_ok=True)
-            image_name = get_image_name(output_path, text)
-            if int(image_name.split("_")[-1]) > 50 :
-                continue
-            cropped_image = crop_image(source_image_path, vertices)
-            try:
-                cropped_image.save(f"{output_path}/{image_name}.jpg")
-            except:
-                continue
+            if text in essential_list:
+                output_path.mkdir(parents=True, exist_ok=True)
+                image_name = get_image_name(output_path, text)
+                if int(image_name.split("_")[-1]) > 100 :
+                    continue
+                cropped_image_path = f"{output_path}/{image_name}.jpg"
+                cropped_image = crop_and_resize(source_image_path, vertices)
+                if cropped_image.width <= 0 or cropped_image.height <= 0:
+                    continue
+                cropped_resized_image = cropped_image.resize((cropped_image.width*2, cropped_image.height*2))
+                try:
+                    cropped_resized_image.save(cropped_image_path)
+                    pre_process_image(cropped_image_path)
+                except:
+                    continue
+                
 
 if __name__ == "__main__":
-    folder_name = "images_tengyur_pecing"
-    ocr_path = Path(f"./data/ocr_output/{folder_name}")
-    source_image_path = Path(f"./data/source_images/{folder_name}")
-    output_image_path = Path(f"./data/cropped_image/")
-    tengyur_images_yml = load_yaml(Path(f"./data/sorted_images.yml"))
-    ocr_paths = create_ocr_paths_order(tengyur_images_yml)
-    extract_symbols(ocr_paths, source_image_path, output_image_path)
+    # folder_names = ["W23957", "W30178", "W30183"]
+    folder_names = ["W30451", "W7371", "W23746", "W30450"]
+    for folder_name in folder_names:
+        source_image_path = Path(f"./data/images/{folder_name}")
+        output_image_path = Path(f"./data/cropped_image/")
+        tengyur_images_yml = load_yaml(Path(f"./shul/{folder_name}_images.yml"))
+        ocr_dir = Path(f"./data/ocr/{folder_name}")
+        ocr_paths = list(Path(f"./data/ocr/").iterdir())
+        extract_symbols(ocr_paths, source_image_path, output_image_path, essential_list)
