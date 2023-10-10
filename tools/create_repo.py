@@ -5,7 +5,7 @@ from tools import github_utils
 parent_dir = Path("./font/")
 
 def publish_repo(local_repo):
-    token = "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"
+    token = ""
     github_utils.github_publish(
         local_repo,
         message="initial commit",
