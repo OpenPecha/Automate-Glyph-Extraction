@@ -140,3 +140,5 @@ Test.py
 *.jsonl
 
 .DS_Store
+fonts/
+data/

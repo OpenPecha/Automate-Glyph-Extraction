@@ -28,6 +28,6 @@ def get_image_paths_order(images_yml):
     return final_images_path
 
 if __name__ == "__main__":
-    images_yml = load_yaml(Path("./data/tengyur_pecing_images_info.yml"))
+    images_yml = load_yaml(Path("./images_2.yml"))
     image_paths = get_image_paths_order(images_yml)
-    dump_yaml(image_paths, Path("./data/sorted_images.yml"))
+    dump_yaml(image_paths, Path("./data/sorted_images_2.yml"))
