@@ -2,8 +2,15 @@ import os
 import configparser
 import boto3
 import random
+<<<<<<< HEAD
 from pathlib import Path
 from tools.utils import get_hash, is_archived
+=======
+import json
+from pathlib import Path
+from tools.utils import get_hash, is_archived
+from openpecha.utils import dump_yaml, load_yaml
+>>>>>>> 9bf9e1677c757451c5c299dc2ba340f516f80830
 from openpecha.buda.api import get_buda_scan_info, get_image_list
 
 
@@ -61,14 +68,20 @@ def get_random_images(work_id):
     return final_dict
 
 def download_and_save_image(bucket_name, obj_dict, save_path):
+<<<<<<< HEAD
     if obj_dict == None:
         return
+=======
+>>>>>>> 9bf9e1677c757451c5c299dc2ba340f516f80830
     for _, obj_keys in obj_dict.items():
         for obj_key in obj_keys:
             image_name = obj_key.split("/")[-1]
             image_path = Path(f"{save_path}/{image_name}")
+<<<<<<< HEAD
             if image_path.exists():
                 continue
+=======
+>>>>>>> 9bf9e1677c757451c5c299dc2ba340f516f80830
             try:
                 response = s3.get_object(Bucket=bucket_name, Key=obj_key)
                 image_data = response['Body'].read()
@@ -79,3 +92,20 @@ def download_and_save_image(bucket_name, obj_dict, save_path):
                 print(f"Image downloaded and saved as {save_path}")
             except Exception as e:
                 print(f"Error: {e}")
+<<<<<<< HEAD
+=======
+
+# Replace these with your actual values
+
+
+if __name__ == "__main__":
+    yml_paths = list(Path(f"./shul/").iterdir())
+    for yml_path in yml_paths:
+        work_id = yml_path.stem
+        object_dict = load_yaml(yml_path)
+        save_path = Path(f'./{work_id}')
+        save_path.mkdir(exist_ok=True)
+        download_and_save_image(bucket_name, object_dict, save_path)
+    # images_dict = get_random_images(work_id)
+    # dump_yaml(images_dict, Path(f"./{work_id}_images.yml"))
+>>>>>>> 9bf9e1677c757451c5c299dc2ba340f516f80830

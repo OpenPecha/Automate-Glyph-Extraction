@@ -157,8 +157,12 @@ def convert_outside_polygon_to_white(image_path, span, output_path):
     result_image = Image.new("RGB", image.size, (255, 255, 255))
     result_image.paste(image, mask=mask)
     headlines = get_headlines(baselines_coord)
+<<<<<<< HEAD
     image_output_path = f"{output_path}/{image_path.split('/')[-1]}"
     # image_output_path = get_image_output_path(result_image, image_path.split("/")[-1], output_path, headlines)
+=======
+    image_output_path = get_image_output_path(result_image, image_path.split("/")[-1], output_path, headlines)
+>>>>>>> 9bf9e1677c757451c5c299dc2ba340f516f80830
     if image_output_path is not None:
         result_image.save(image_output_path)
         return image_output_path
@@ -173,12 +177,20 @@ def get_image_path(image_url):
     try:
         response = s3.get_object(Bucket=bucket_name, Key=decoded_key)
         image_data = response['Body'].read()
+<<<<<<< HEAD
         with open(f"./downloaded_glyph/{image_name}", 'wb') as f:
+=======
+        with open(f"./downloaded_glyphs/{image_name}", 'wb') as f:
+>>>>>>> 9bf9e1677c757451c5c299dc2ba340f516f80830
             f.write(image_data)
 
     except Exception as e:
         print(f"Error while downloading {image_name} due to {e}")
+<<<<<<< HEAD
     return f"./downloaded_glyph/{image_name}"
+=======
+    return f"./downloaded_glyphs/{image_name}"
+>>>>>>> 9bf9e1677c757451c5c299dc2ba340f516f80830
 
 
 def find_glyph_bbox(image):
@@ -227,7 +239,11 @@ def create_svg_with_glyph(png_path, output_svg_path):
         # Save the SVG file
         dwg.save()
 
+<<<<<<< HEAD
 def main():
+=======
+if __name__ == "__main__":
+>>>>>>> 9bf9e1677c757451c5c299dc2ba340f516f80830
     jsonl_paths = list(Path("./data/jsonl/").iterdir())
     for jsonl_path in jsonl_paths:
         with jsonlines.open(jsonl_path) as reader:
@@ -241,6 +257,7 @@ def main():
                         continue
                     filename = (cleaned_image_path.split("/")[-1]).split(".")[0]
                     output_path = Path(f"./svg/{filename}.svg")
+<<<<<<< HEAD
                     png_to_svg(cleaned_image_path, output_path)
 
 
@@ -261,3 +278,6 @@ if __name__ == "__main__":
                     # filename = (cleaned_image_path.split("/")[-1]).split(".")[0]
                     # output_path = Path(f"./glyph_images/{filename}.svg")
                     # png_to_svg(cleaned_image_path, output_path)
+=======
+                    png_to_svg(cleaned_image_path, output_path)
+>>>>>>> 9bf9e1677c757451c5c299dc2ba340f516f80830
