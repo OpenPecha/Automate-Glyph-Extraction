@@ -1,19 +1,11 @@
 import io
 import botocore
-<<<<<<< HEAD
 import shutil
 from tools import github_utils
 from PIL import Image as PillowImage, ImageOps
 from pathlib import Path
 import hashlib
-=======
-from PIL import Image as PillowImage, ImageOps
-from pathlib import Path
-import hashlib
-import os
-import cv2
->>>>>>> 9bf9e1677c757451c5c299dc2ba340f516f80830
-from PIL import Image, ImageOps, ImageFilter
+from PIL import Image, ImageOps
 # from wand.image import Image as WandImage
 
 def publish_repo(local_repo):
@@ -102,7 +94,6 @@ def crop_and_resize(source_image_path, vertices, expand_percentage=4, greyscale=
         cropped_resized_image = img.resize((img.width*2, img.height*2))
     return cropped_resized_image, new_vertices
 
-<<<<<<< HEAD
 # def pre_process_image(filepath, image):
 #     filename = filepath.split("/")[-1]
 #     glyph = filename.split("_")[0]
@@ -115,61 +106,6 @@ def crop_and_resize(source_image_path, vertices, expand_percentage=4, greyscale=
 #     if not os.path.exists(output_file_path.parent):
 #         os.makedirs(output_file_path.parent)
 #     img.save(output_file_path, 'PNG')
-=======
-
-    return expanded_image
-
-# used for tengyur pecing
-def pre_process_image(filepath):
-    filename = filepath.split("/")[-1]
-    glyph = filename.split("_")[0]
-    output_dir = Path(f"./data/glyphs/{glyph}")
-    # Check if output directory exists and if not, create it
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-    img = Image.open(filepath)
-    img = ImageOps.autocontrast(img)
-    # Convert image to grayscale and then to black and white for binarization
-    img = img.convert('L').convert('1', dither=Image.NONE)
-
-    base_filename = os.path.splitext(filename)[0]
-    output_file_path = Path(f"{output_dir}/{base_filename}.png")
-    if not os.path.exists(output_file_path.parent):
-        os.makedirs(output_file_path.parent)
-    img.save(output_file_path, 'PNG')
-
-
-# def pre_process_image(filepath):
-#     filename = os.path.basename(filepath)
-#     glyph = filename.split("_")[0]
-#     output_dir = f"./data/glyphs/{glyph}"
-    
-#     # Check if output directory exists and if not, create it
-#     if not os.path.exists(output_dir):
-#         os.makedirs(output_dir)
-    
-#     # Read the image
-#     img = cv2.imread(filepath)
-    
-#     # Auto contrast adjustment
-#     lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
-#     l, a, b = cv2.split(lab)
-#     clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8, 8))
-#     cl = clahe.apply(l)
-#     limg = cv2.merge((cl, a, b))
-#     img = cv2.cvtColor(limg, cv2.COLOR_LAB2BGR)
-    
-#     # Convert to grayscale
-#     img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    
-#     # Thresholding to convert the image to black and white
-#     _, img_bw = cv2.threshold(img_gray, 128, 255, cv2.THRESH_BINARY)
-    
-#     # Save the image as PNG
-#     base_filename = os.path.splitext(filename)[0]
-#     output_file_path = f"{output_dir}/{base_filename}.png"
-#     cv2.imwrite(output_file_path, img_bw)
->>>>>>> 9bf9e1677c757451c5c299dc2ba340f516f80830
 
 
 def list_obj_keys(prefix, s3_client, bucket_name):
@@ -230,11 +166,6 @@ def save_file(bits, filename, output_path):
 def is_archived(s3_key, s3_client, Bucket):
     try:
         s3_client.head_object(Bucket=Bucket, Key=s3_key)
-<<<<<<< HEAD
     except:
-=======
-    except Exception as e:
-        print(f"error {e}")
->>>>>>> 9bf9e1677c757451c5c299dc2ba340f516f80830
         return False
     return True
