@@ -5,6 +5,7 @@ from openpecha.utils import dump_yaml, load_yaml
 from openpecha.buda.api import get_buda_scan_info, get_image_list
 import re
 
+
 def remove_non_page(images_list, work_id, image_group_id):
     s3_keys = []
     hash_two = get_hash(work_id)
@@ -14,7 +15,7 @@ def remove_non_page(images_list, work_id, image_group_id):
         else:
             if re.search(r"[A-Z]", image_group_id[1:]) == None:
                 image_group = image_group_id[1:]
-            else: 
+            else:
                 image_group = image_group_id
             s3_key = f"Works/{hash_two}/{work_id}/images/{work_id}-{image_group}/{image['filename']}"
             s3_keys.append(s3_key)
