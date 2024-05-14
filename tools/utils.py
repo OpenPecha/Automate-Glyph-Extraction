@@ -1,18 +1,10 @@
 import io
 import botocore
-<<<<<<< HEAD
 import shutil
 from tools import github_utils
 from PIL import Image as PillowImage, ImageOps
 from pathlib import Path
 import hashlib
-=======
-from PIL import Image as PillowImage, ImageOps
-from pathlib import Path
-import hashlib
-import os
-import cv2
->>>>>>> 9bf9e1677c757451c5c299dc2ba340f516f80830
 from PIL import Image, ImageOps, ImageFilter
 # from wand.image import Image as WandImage
 
@@ -102,7 +94,6 @@ def crop_and_resize(source_image_path, vertices, expand_percentage=4, greyscale=
         cropped_resized_image = img.resize((img.width*2, img.height*2))
     return cropped_resized_image, new_vertices
 
-<<<<<<< HEAD
 # def pre_process_image(filepath, image):
 #     filename = filepath.split("/")[-1]
 #     glyph = filename.split("_")[0]
@@ -115,9 +106,7 @@ def crop_and_resize(source_image_path, vertices, expand_percentage=4, greyscale=
 #     if not os.path.exists(output_file_path.parent):
 #         os.makedirs(output_file_path.parent)
 #     img.save(output_file_path, 'PNG')
-=======
-
-    return expanded_image
+#    return expanded_image
 
 # used for tengyur pecing
 def pre_process_image(filepath):
@@ -169,8 +158,6 @@ def pre_process_image(filepath):
 #     base_filename = os.path.splitext(filename)[0]
 #     output_file_path = f"{output_dir}/{base_filename}.png"
 #     cv2.imwrite(output_file_path, img_bw)
->>>>>>> 9bf9e1677c757451c5c299dc2ba340f516f80830
-
 
 def list_obj_keys(prefix, s3_client, bucket_name):
     obj_keys = []
@@ -230,11 +217,7 @@ def save_file(bits, filename, output_path):
 def is_archived(s3_key, s3_client, Bucket):
     try:
         s3_client.head_object(Bucket=Bucket, Key=s3_key)
-<<<<<<< HEAD
-    except:
-=======
     except Exception as e:
         print(f"error {e}")
->>>>>>> 9bf9e1677c757451c5c299dc2ba340f516f80830
         return False
     return True
