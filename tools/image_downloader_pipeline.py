@@ -1,30 +1,8 @@
-import os
-import configparser
-import boto3
+from tools.config import BDRC_ARCHIVE_BUCKET as bucket_name, bdrc_archive_s3_client as s3_client
 from pathlib import Path
 from tools.utils import get_hash, is_archived
 from openpecha.buda.api import get_buda_scan_info, get_image_list
 import re
-from tools.config import BDRC_ARCHIVE_BUCKET as bucket_name, bdrc_archive_s3_client as s3_client
-
-BDRC_ARCHIVE_BUCKET = "archive.tbrc.org"
-OCR_OUTPUT_BUCKET = "ocr.bdrc.io"
-aws_credentials_file = os.path.expanduser("~/.aws/credentials")
-config = configparser.ConfigParser()
-config.read(aws_credentials_file)
-
-
-bdrc_archive_session = boto3.Session(
-    aws_access_key_id= config.get("archive_tbrc_org", "aws_access_key_id"),
-    aws_secret_access_key= config.get("archive_tbrc_org", "aws_secret_access_key")
-)
-bdrc_archive_s3_client = bdrc_archive_session.client('s3')
-bdrc_archive_s3_resource = bdrc_archive_session.resource('s3')
-bdrc_archive_bucket = bdrc_archive_s3_resource.Bucket(BDRC_ARCHIVE_BUCKET)
-ocr_output_bucket = bdrc_archive_s3_resource.Bucket(OCR_OUTPUT_BUCKET)
-
-bucket_name = BDRC_ARCHIVE_BUCKET
-s3 = bdrc_archive_s3_client
 
 def remove_non_page(images_list, work_id, image_group_id):
     s3_keys = []
@@ -40,7 +18,6 @@ def remove_non_page(images_list, work_id, image_group_id):
             s3_key = f"Works/{hash_two}/{work_id}/images/{work_id}-{image_group}/{image['filename']}"
             s3_keys.append(s3_key)
     return s3_keys
-
 
 def get_random_images_dict(work_id, s3_client, bucket_name, random_flag=True):
     final_dict = {}
@@ -61,7 +38,6 @@ def get_random_images_dict(work_id, s3_client, bucket_name, random_flag=True):
         final_dict.update(curr_dict)
     return final_dict
 
-
 def download_and_save_image(bucket_name, obj_dict, save_path):
     if obj_dict == None:
         return
@@ -72,7 +48,7 @@ def download_and_save_image(bucket_name, obj_dict, save_path):
             if image_path.exists():
                 continue
             try:
-                response = s3.get_object(Bucket=bucket_name, Key=obj_key)
+                response = s3_client.get_object(Bucket=bucket_name, Key=obj_key)
                 image_data = response['Body'].read()
                 
                 with open(image_path, 'wb') as f:
@@ -92,4 +68,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

@@ -2,19 +2,16 @@ import configparser
 import os
 import boto3
 
-def get_config():
-    config = configparser.ConfigParser()
-    aws_credentials_file = os.path.expanduser("~/.aws/credentials")
-    config.read(aws_credentials_file)
-    return config
-
-config = get_config()
-
 PAGE_CROPPING_BUCKET = "image-processing.bdrc.io"
 BDRC_ARCHIVE_BUCKET = "archive.tbrc.org"
 OCR_OUTPUT_BUCKET = "ocr.bdrc.io"
 LAYOUT_ANALYSIS_BUCKET = "image-processing.openpecha"
 MONLAM_AI_OCR_BUCKET = "monlam.ai.ocr"
+
+aws_credentials_file = os.path.expanduser("~/.aws/credentials")
+config = configparser.ConfigParser()
+config.read(aws_credentials_file)
+
 
 page_cropping_session = boto3.Session(
     aws_access_key_id= config.get("image_processing_bdrc_io", "aws_access_key_id"),
