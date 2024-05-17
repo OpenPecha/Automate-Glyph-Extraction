@@ -1,13 +1,10 @@
 import json
 import gzip
 import re
-import os
-from openpecha.utils import load_yaml
 from pathlib import Path
 from utils import crop_and_resize
 
-essential_list = Path(f"./data/tibetan_essential_list.txt").read_text().split("\n")
-
+required_glyph_list = Path(f"../data/tibetan_essential_list.txt").read_text(encoding='utf-8').split("\n")
 
 def get_bounding_poly_for_symbol(ocr_path):
     curr = []
@@ -48,22 +45,23 @@ def get_image_name(output_dir, text):
         image_name = f"{text}_"+str(name + 1)  
         return image_name
 
-def get_source_image_path(ocr_path, source_dir_path):
+def get_source_image_path(ocr_path, source_img_path):
     filename = (ocr_path.stem).split(".")[0]
-    for image_path in source_dir_path.iterdir():
+    for image_path in source_img_path.iterdir():
         image_name = image_path.stem
         if filename == image_name:
             return image_path
 
 def update_csv(cropped_image_path, vertices, image_path, font_name):
     filename = cropped_image_path.split("/")[-1]
-    with open(f"./{font_name}_glyphs.csv", "a") as f:
+    with open(f"../data/{font_name}_glyphs.csv", "a", encoding='utf-8') as f:
         f.write(f"{filename}, {image_path}, {vertices}\n")
 
-def extract_symbols(ocr_paths, source_dir_path, done_list, font_name):
+
+def extract_symbols(ocr_paths, source_img_path, done_list, font_name):
     for num, ocr_path in enumerate(ocr_paths, 1):
         print(num)
-        source_image_path = get_source_image_path(ocr_path, source_dir_path)
+        source_image_path = get_source_image_path(ocr_path, source_img_path)
         bounding_polys = get_bounding_poly_for_symbol(ocr_path)
         if bounding_polys == None:
             continue
@@ -71,9 +69,9 @@ def extract_symbols(ocr_paths, source_dir_path, done_list, font_name):
             text = value[0]['text']
             if text in done_list:
                 continue
-            if text in essential_list:
+            if text in required_glyph_list:
                 vertices = value[0]['vertices']
-                output_path = Path(f"./data/glyphs/{text}")
+                output_path = Path(f"../data/glyphs/derge/{text}")
                 if output_path.exists() == False:
                     output_path.mkdir(parents=True, exist_ok=True)
                 image_name = get_image_name(output_path, text)
@@ -85,4 +83,20 @@ def extract_symbols(ocr_paths, source_dir_path, done_list, font_name):
                     continue
                 cropped_image.save(cropped_image_path, 'PNG')
                 update_csv(cropped_image_path, new_vertices, source_image_path, font_name)
+
+def main():
+    folder_names = ["W3CN20612"]
+    done_list = Path(f"../data/present_list/derge_present_tibetan_glyphs.txt").read_text(encoding='utf-8').split("\n")
+    Path(f"../data/cropped_image/")
+    for folder_name in folder_names:
+        source_img_path = Path(f"../data/images/derge/{folder_name}")
+        ocr_dir = Path(f"../data/ocr_json/derge/{folder_name}")
+        ocr_paths = list(ocr_dir.iterdir())
+        extract_symbols(ocr_paths, source_img_path, done_list, folder_name)
+
+    
+
+
+if __name__ == "__main__":
+    main()
                 
