@@ -1,8 +1,6 @@
-
 import os
 import re
 import random
-
 from pathlib import Path
 from tools.utils import get_hash, is_archived
 from openpecha.buda.api import get_buda_scan_info, get_image_list

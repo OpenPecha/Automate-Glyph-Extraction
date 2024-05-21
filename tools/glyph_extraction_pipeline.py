@@ -4,9 +4,16 @@ import re
 from pathlib import Path
 from utils import crop_and_resize
 
+DATA_DIR = Path("../data")
+GLYPH_LIST_PATH = DATA_DIR / "tibetan_essential_list.txt"
+PRESENT_LIST_PATH = DATA_DIR / "present_list/shul_present_list.txt"
+SOURCE_IMAGES_DIR = DATA_DIR / "source_images/shul"
+OCR_JSON_DIR = DATA_DIR / "ocr_json/shul"
+OUTPUT_GLYPHS_DIR = DATA_DIR / "glyphs/pecing"
+CSV_DIR = DATA_DIR / "csv/pecing"
+
 def load_required_glyphs():
-    glyph_list_path = Path("../data/tibetan_essential_list.txt")
-    return glyph_list_path.read_text(encoding='utf-8').split("\n")
+    return GLYPH_LIST_PATH.read_text(encoding='utf-8').split("\n")
 
 def get_bounding_poly_for_symbol(ocr_path):
     bounding_polys = []
@@ -43,17 +50,14 @@ def get_image_name(output_dir, text):
 
 def get_source_image_path(ocr_path, source_img_path):
     filename = ocr_path.stem.split(".")[0]
-    print(f"Looking for source image with base filename: {filename}")
     for image_path in source_img_path.iterdir():
-        print(f"Checking image file: {image_path.stem}")
         if filename == image_path.stem:
-            print(f"Found matching image: {image_path}")
             return image_path
     raise FileNotFoundError(f"source image not found for OCR file: {ocr_path}")
 
 def update_csv(cropped_image_path, vertices, image_path, work_id):
     filename = cropped_image_path.name
-    csv_path = Path(f"../data/csv/pecing/{work_id}_glyphs.csv")
+    csv_path = CSV_DIR / f"{work_id}_glyphs.csv"
     with csv_path.open("a", encoding='utf-8') as f:
         f.write(f"{filename}, {image_path}, {vertices}\n")
 
@@ -76,7 +80,7 @@ def extract_symbols(ocr_paths, source_img_path, done_list, required_glyph_list, 
                 continue
             
             vertices = value[0]['vertices']
-            output_path = Path(f"../data/glyphs/pecing/{text}")
+            output_path = OUTPUT_GLYPHS_DIR / text
             output_path.mkdir(parents=True, exist_ok=True)
             
             image_name = get_image_name(output_path, text)
@@ -98,12 +102,12 @@ def extract_symbols(ocr_paths, source_img_path, done_list, required_glyph_list, 
 
 def main():
     required_glyph_list = load_required_glyphs()
-    done_list = Path("../data/present_list/pecing_present_list.txt").read_text(encoding='utf-8').split("\n")
+    done_list = PRESENT_LIST_PATH.read_text(encoding='utf-8').split("\n")
     
     folder_names = ["W1KG13126"]
     for folder_name in folder_names:
-        source_img_path = Path(f"../data/source_images/pecing/{folder_name}")
-        ocr_dir = Path(f"../data/ocr_json/pecing/{folder_name}")
+        source_img_path = SOURCE_IMAGES_DIR / folder_name
+        ocr_dir = OCR_JSON_DIR / folder_name
         ocr_paths = [p for p in ocr_dir.iterdir() if p.is_file() and not p.name.startswith('.')]
         extract_symbols(ocr_paths, source_img_path, done_list, required_glyph_list, folder_name)
 
