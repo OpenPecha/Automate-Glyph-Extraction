@@ -1,12 +1,12 @@
-W3CN20612
-W1KG13126
-W8LS73589
-W7371
-W23746
-W23957
-W30116
-W30178
-W30183
-W30450
-W30451
-W22344
+W3CN20612  - derge
+W1KG13126  - pecing
+W8LS73589  - shul
+W7371      - shul
+W23746     - shul
+W23957     - shul
+W30116     - shul
+W30178     - shul
+W30183     - shul
+W30450     - shul
+W30451     - shul
+W22344     - drepung gaden prodang

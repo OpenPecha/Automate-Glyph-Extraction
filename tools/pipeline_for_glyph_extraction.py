@@ -1,4 +1,4 @@
-from tools.extract_symbols import extract_symbols
+from tools.glyph_extraction_pipeline import extract_symbols
 from pathlib import Path
 from tools.create_repo import publish_repo, create_repo_folders
 from tools.pipeline_for_glyph_jsonl import clone_repo
