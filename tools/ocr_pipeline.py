@@ -11,12 +11,14 @@ from google.cloud.vision import AnnotateImageResponse
 if "GOOGLE_APPLICATION_CREDENTIALS" not in os.environ:
     raise EnvironmentError("environment variable for GAC is not set.")
 
-print(os.environ["GOOGLE_APPLICATION_CREDENTIALS"])
-
+print(f"GAC Path: {os.environ['GOOGLE_APPLICATION_CREDENTIALS']}")
 
 vision_client = vision.ImageAnnotatorClient()
 
-
+INPUT_TIFF_DIR = Path("../data/source_images/tiff/")
+INPUT_JPEG_DIR = Path("../data/source_images/jpeg/")
+OUTPUT_JPEG_DIR = Path("../data/source_images/jpeg/")
+OUTPUT_OCR_DIR = Path("../data/ocr_json/")
 
 def google_ocr(image, lang_hint=None):
     if isinstance(image, (str, Path)):
@@ -52,6 +54,7 @@ def gzip_str(string_):
 
 def apply_ocr_on_folder(images_dir, OCR_dir, lang=None):
     if not images_dir.is_dir():
+        logging.error(f"{images_dir} is not a directory")
         return
     for img_fn in list(images_dir.iterdir()):
         result_fn = OCR_dir / f"{img_fn.stem}.json.gz"
@@ -67,40 +70,40 @@ def apply_ocr_on_folder(images_dir, OCR_dir, lang=None):
         result_fn.write_bytes(gzip_result)
 
 def ocr_images(images_path):
-    OCR_output_path = Path(f"../data/ocr_json/{images_path.stem}/")
+    OCR_output_path = OUTPUT_OCR_DIR / images_path.stem
     OCR_output_path.mkdir(parents=True, exist_ok=True)
     apply_ocr_on_folder(
-            images_dir = images_path,
-            OCR_dir = OCR_output_path
-        )
+        images_dir=images_path,
+        OCR_dir=OCR_output_path
+    )
 
 def OCR_tiff_images(tiff_dir):
     title = tiff_dir.name
     tiff_paths = tiff_dir.iterdir()
     for tiff_path in tiff_paths:
         image_name = tiff_path.stem
-        output_path = Path(f"../data/source_images/jpeg/{title}/")
+        output_path = OUTPUT_JPEG_DIR / title
         output_path.mkdir(parents=True, exist_ok=True)
         try:
             tiff_image = Image.open(tiff_path)
             if tiff_image.mode == 'CMYK':
                 tiff_image = tiff_image.convert('RGB')
-            result_fn = Path(f"{output_path}/{image_name}.jpg")
+            result_fn = output_path / f"{image_name}.jpg"
             if result_fn.is_file():
                 continue
             tiff_image.save(result_fn, 'JPEG')
         except Exception as e:
-            print(f"Error converting TIFF to JPEG: {e}")
-    jpeg_path = Path(f"../data/source_images/jpeg/{title}")
+            logging.exception(f"Error converting TIFF to JPEG: {e}")
+    jpeg_path = OUTPUT_JPEG_DIR / title
     ocr_images(jpeg_path)
 
-def main(type):
-    if type == "tiff":
-        tiff_dirs = list(Path(f"../data/source_images/tiff/").iterdir())
+def main(file_type):
+    if file_type == "tiff":
+        tiff_dirs = list(INPUT_TIFF_DIR.iterdir())
         for tiff_dir in tiff_dirs:
             OCR_tiff_images(tiff_dir)
-    elif type == "jpeg":
-        images_paths = sorted(Path(f"../data/source_images/jpeg/").iterdir())
+    elif file_type == "jpeg":
+        images_paths = sorted(INPUT_JPEG_DIR.iterdir())
         for images_path in images_paths:
             ocr_images(images_path)
 
