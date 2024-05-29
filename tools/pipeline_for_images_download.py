@@ -14,22 +14,20 @@ aws_credentials_file = os.path.expanduser("~/.aws/credentials")
 config = configparser.ConfigParser()
 config.read(aws_credentials_file)
 
-
 bdrc_archive_session = boto3.Session(
-    aws_access_key_id= config.get("archive_tbrc_org", "aws_access_key_id"),
-    aws_secret_access_key= config.get("archive_tbrc_org", "aws_secret_access_key")
+    aws_access_key_id=config.get("archive_tbrc_org", "aws_access_key_id"),
+    aws_secret_access_key=config.get("archive_tbrc_org", "aws_secret_access_key")
 )
 bdrc_archive_s3_client = bdrc_archive_session.client('s3')
 bdrc_archive_s3_resource = bdrc_archive_session.resource('s3')
 bdrc_archive_bucket = bdrc_archive_s3_resource.Bucket(BDRC_ARCHIVE_BUCKET)
-
 
 bucket_name = BDRC_ARCHIVE_BUCKET
 s3 = bdrc_archive_s3_client
 
 
 def download_and_save_image(bucket_name, obj_dict, save_path):
-    if obj_dict == None:
+    if obj_dict is None:
         return
     for _, obj_keys in obj_dict.items():
         for obj_key in obj_keys:
@@ -44,7 +42,7 @@ def download_and_save_image(bucket_name, obj_dict, save_path):
                 with open(image_path, 'wb') as f:
                     f.write(image_data)
                 
-                print(f"Image downloaded and saved as {save_path}")
+                print(f"Image downloaded and saved as {image_path}")
             except Exception as e:
                 print(f"Error: {e}")
 
@@ -67,7 +65,7 @@ def get_random_images_dict(work_id, s3_client, bucket_name, random_flag=True):
     final_dict = {}
     curr_dict = {}
     scan_info = get_buda_scan_info(work_id)
-    if scan_info == None:
+    if scan_info is None:
         return None
     for image_group_id, _ in scan_info["image_groups"].items():
         images_s3_keys = []
