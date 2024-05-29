@@ -71,7 +71,7 @@ def download_and_save_image(bucket_name, obj_dict, save_path):
 
 def main():
 
-    work_ids = Path(f"./data/work_ids/").read_text(encoding='utf-8').split("\n")
+    work_ids = Path(f"./data/work_ids/derge_works.txt").read_text(encoding='utf-8').split("\n")
     for work_id in work_ids:
         save_path = Path(f'./data/images/{work_id}')
         save_path.mkdir(exist_ok=True, parents=True)
