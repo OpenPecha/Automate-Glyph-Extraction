@@ -71,9 +71,9 @@ def download_and_save_image(bucket_name, obj_dict, save_path):
 
 def main():
 
-    work_ids = Path(f"./data/").read_text(encoding='utf-8').split("\n")
+    work_ids = Path(f"./data/work_ids/").read_text(encoding='utf-8').split("\n")
     for work_id in work_ids:
-        save_path = Path(f'./images/{work_id}')
+        save_path = Path(f'./data/images/{work_id}')
         save_path.mkdir(exist_ok=True, parents=True)
         images_dict = get_random_images_dict(work_id, bdrc_archive_s3_client, BDRC_ARCHIVE_BUCKET, random_flag=False)
         download_and_save_image(BDRC_ARCHIVE_BUCKET, images_dict, save_path)
