@@ -61,7 +61,7 @@ def download_and_save_image(bucket_name, obj_dict, save_path):
             if image_path.exists():
                 continue
             try:
-                print(f"Verifying s3_key: {obj_key}")
+                print(f"Verifying s3_key: {obj_key} in bucket: {bucket_name}")
                 response = s3_client.get_object(
                     Bucket=bucket_name, Key=obj_key)
                 image_data = response['Body'].read()
@@ -70,6 +70,14 @@ def download_and_save_image(bucket_name, obj_dict, save_path):
                 print(f"Image downloaded and saved as {image_path}")
             except Exception as e:
                 print(f"Error downloading {obj_key}: {e}")
+                # Print more specific error messages for debugging
+                if hasattr(e, 'response') and e.response is not None:
+                    print(f"Error code: {e.response['Error']['Code']}")
+                    print(f"Error message: {e.response['Error']['Message']}")
+                else:
+                    print(f"Error type: {type(e).__name__}")
+                    print(f"Error details: {str(e)}")
+
 
 def main():
     work_ids = Path(
