@@ -16,6 +16,9 @@ aws_credentials_file = os.path.expanduser("~/.aws/credentials")
 config = configparser.ConfigParser()
 config.read(aws_credentials_file)
 
+print("Configuring AWS credentials...")
+print(f"AWS Access Key ID: {config.get('archive_tbrc_org', 'aws_access_key_id')}")
+print(f"AWS Secret Access Key: {config.get('archive_tbrc_org', 'aws_secret_access_key')}")
 
 bdrc_archive_session = boto3.Session(
     aws_access_key_id= config.get("archive_tbrc_org", "aws_access_key_id"),
@@ -31,7 +34,7 @@ s3 = bdrc_archive_s3_client
 
 
 def download_and_save_image(bucket_name, obj_dict, save_path):
-    if obj_dict is None:
+    if obj_dict == None:
         print("No images to download.")
         return
     for _, obj_keys in obj_dict.items():
@@ -72,7 +75,7 @@ def get_random_images_dict(work_id, s3_client, bucket_name, random_flag=True):
     final_dict = {}
     curr_dict = {}
     scan_info = get_buda_scan_info(work_id)
-    if scan_info is None:
+    if scan_info == None:
         print("No scan info available.")
         return None
     for image_group_id, _ in scan_info["image_groups"].items():
