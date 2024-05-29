@@ -19,34 +19,22 @@ def remove_non_page(images_list, work_id, image_group_id):
             s3_keys.append(s3_key)
     return s3_keys
 
-def get_random_images_dict(work_id, s3_client, bucket_name, random_flag=True):
+def get_random_images(work_id):
     final_dict = {}
     curr_dict = {}
     scan_info = get_buda_scan_info(work_id)
-    if scan_info is None:
-        return None
     for image_group_id, _ in scan_info["image_groups"].items():
         images_s3_keys = []
         images_list = get_image_list(work_id, image_group_id)
         s3_keys = remove_non_page(images_list, work_id, image_group_id)
-        if random_flag:
-            random_images = random.sample(s3_keys, min(len(s3_keys), 200))
-            for random_image in random_images:
-                if random_image in images_s3_keys:
-                    continue
-                if is_archived(random_image, s3_client, bucket_name):
-                    if len(images_s3_keys) == 150:
-                        break
-                    else:
-                        images_s3_keys.append(random_image)
-        else:
-            for s3_key in s3_keys:
-                if s3_key in images_s3_keys:
-                    continue
-                if is_archived(s3_key, s3_client, bucket_name):
-                    images_s3_keys.append(s3_key)
-                    if len(images_s3_keys) == 10:
-                        break
+        print(f"image_group_id: {image_group_id} total_images: {len(images_list)}, after_clean: {len(s3_keys)}")
+        random_images = list(random.sample(s3_keys, 100))
+        for random_image in random_images:
+            if is_archived(random_image, bdrc_archive_s3_client, BDRC_ARCHIVE_BUCKET):
+                if len(images_s3_keys) == 75:
+                    break
+                else:
+                    images_s3_keys.append(random_image)
         curr_dict[image_group_id] = images_s3_keys
         final_dict.update(curr_dict)
     return final_dict
