@@ -8,22 +8,6 @@ from utils import get_hash, is_archived
 from openpecha.buda.api import get_buda_scan_info, get_image_list
 from config import BDRC_ARCHIVE_BUCKET as bucket_name, bdrc_archive_s3_client as s3_client
 
-BDRC_ARCHIVE_BUCKET = "archive.tbrc.org"
-
-aws_credentials_file = os.path.expanduser("~/.aws/credentials")
-config = configparser.ConfigParser()
-config.read(aws_credentials_file)
-
-bdrc_archive_session = boto3.Session(
-    aws_access_key_id=config.get("archive_tbrc_org", "aws_access_key_id"),
-    aws_secret_access_key=config.get("archive_tbrc_org", "aws_secret_access_key")
-)
-bdrc_archive_s3_client = bdrc_archive_session.client('s3')
-bdrc_archive_s3_resource = bdrc_archive_session.resource('s3')
-bdrc_archive_bucket = bdrc_archive_s3_resource.Bucket(BDRC_ARCHIVE_BUCKET)
-
-bucket_name = BDRC_ARCHIVE_BUCKET
-s3 = bdrc_archive_s3_client
 
 
 def download_and_save_image(bucket_name, obj_dict, save_path):
@@ -36,7 +20,7 @@ def download_and_save_image(bucket_name, obj_dict, save_path):
             if image_path.exists():
                 continue
             try:
-                response = s3.get_object(Bucket=bucket_name, Key=obj_key)
+                response = s3_client.get_object(Bucket=bucket_name, Key=obj_key)
                 image_data = response['Body'].read()
                 
                 with open(image_path, 'wb') as f:
