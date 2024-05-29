@@ -2,7 +2,7 @@ import io
 import os
 import botocore
 import shutil
-from tools import github_utils
+import github_utils
 from PIL import Image as PillowImage, ImageOps
 from pathlib import Path
 import hashlib
