@@ -4,7 +4,7 @@ import random
 from pathlib import Path
 from utils import get_hash, is_archived
 from openpecha.buda.api import get_buda_scan_info, get_image_list
-from config import BDRC_ARCHIVE_BUCKET, bdrc_archive_s3_client
+from config import BDRC_ARCHIVE_BUCKET as bucket_name, bdrc_archive_s3_client as s3_client
 
 def remove_non_page(images_list, work_id, image_group_id):
     s3_keys = []
@@ -62,7 +62,7 @@ def download_and_save_image(bucket_name, obj_dict, save_path):
                 continue
             try:
                 print(f"Verifying s3_key: {obj_key}") 
-                response = bdrc_archive_s3_client.get_object(Bucket=bucket_name, Key=obj_key)
+                response = s3_client.get_object(Bucket=bucket_name, Key=obj_key)
                 image_data = response['Body'].read()
                 with open(image_path, 'wb') as f:
                     f.write(image_data)
@@ -75,8 +75,8 @@ def main():
     for work_id in work_ids:
         save_path = Path(f'../data/images/{work_id}')
         save_path.mkdir(exist_ok=True, parents=True)
-        images_dict = get_random_images(work_id)
-        download_and_save_image(BDRC_ARCHIVE_BUCKET, images_dict, save_path)
+        images_dict = get_random_images(work_id, s3_client, bucket_name, random_flag=False)
+        download_and_save_image(bucket_name, images_dict, save_path)
 
 if __name__ == "__main__":
     main()
