@@ -4,7 +4,7 @@ import random
 from pathlib import Path
 from utils import get_hash, is_archived
 from openpecha.buda.api import get_buda_scan_info, get_image_list
-from config import BDRC_ARCHIVE_BUCKET, bdrc_archive_s3_client
+from config import BDRC_ARCHIVE_BUCKET as bucket_name, bdrc_archive_s3_client as s3_client
 
 def remove_non_page(images_list, work_id, image_group_id):
     s3_keys = []
@@ -19,23 +19,34 @@ def remove_non_page(images_list, work_id, image_group_id):
             s3_keys.append(s3_key)
     return s3_keys
 
-def get_random_images(work_id):
+def get_random_images(work_id, s3_client, bucket_name, random_flag=True):
     final_dict = {}
     curr_dict = {}
     scan_info = get_buda_scan_info(work_id)
+    if scan_info == None:
+        return None
     for image_group_id, _ in scan_info["image_groups"].items():
         images_s3_keys = []
         images_list = get_image_list(work_id, image_group_id)
         s3_keys = remove_non_page(images_list, work_id, image_group_id)
-        print(
-            f"image_group_id: {image_group_id} total_images: {len(images_list)}, after_clean: {len(s3_keys)}")
-        random_images = list(random.sample(s3_keys, 100))
-        for random_image in random_images:
-            if is_archived(random_image, bdrc_archive_s3_client, BDRC_ARCHIVE_BUCKET):
-                if len(images_s3_keys) == 75:
-                    break
-                else:
-                    images_s3_keys.append(random_image)
+        if random_flag:
+            random_images = list(random.sample(s3_keys, 200))
+            for random_image in random_images:
+                if random_image in images_s3_keys:
+                    continue
+                if is_archived(random_image, s3_client, bucket_name):
+                    if len(images_s3_keys) == 150:
+                        break
+                    else:
+                        images_s3_keys.append(random_image)
+        else:
+            for s3_key in s3_keys:
+                if s3_key in images_s3_keys:
+                    continue
+                if is_archived(s3_key, s3_client, bucket_name):
+                    images_s3_keys.append(s3_key)
+                    if len(images_s3_keys) == 10:
+                        break
         curr_dict[image_group_id] = images_s3_keys
         final_dict.update(curr_dict)
     return final_dict
@@ -51,7 +62,7 @@ def download_and_save_image(bucket_name, obj_dict, save_path):
                 continue
             try:
                 print(f"Verifying s3_key: {obj_key}")
-                response = bdrc_archive_s3_client.get_object(
+                response = s3_client.get_object(
                     Bucket=bucket_name, Key=obj_key)
                 image_data = response['Body'].read()
                 with open(image_path, 'wb') as f:
@@ -66,8 +77,8 @@ def main():
     for work_id in work_ids:
         save_path = Path(f'../data/images/{work_id}')
         save_path.mkdir(exist_ok=True, parents=True)
-        images_dict = get_random_images(work_id)
-        download_and_save_image(BDRC_ARCHIVE_BUCKET, images_dict, save_path)
+        images_dict = get_random_images(work_id, s3_client, bucket_name, random_flag=False)
+        download_and_save_image(bucket_name, images_dict, save_path)
 
 if __name__ == "__main__":
     main()
