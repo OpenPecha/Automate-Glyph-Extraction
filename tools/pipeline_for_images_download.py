@@ -61,6 +61,7 @@ def download_and_save_image(bucket_name, obj_dict, save_path):
             if image_path.exists():
                 continue
             try:
+                print(f"Verifying s3_key: {obj_key}") 
                 response = bdrc_archive_s3_client.get_object(Bucket=bucket_name, Key=obj_key)
                 image_data = response['Body'].read()
                 with open(image_path, 'wb') as f:
