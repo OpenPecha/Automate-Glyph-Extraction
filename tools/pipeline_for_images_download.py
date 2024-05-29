@@ -34,31 +34,19 @@ def get_random_images(work_id, s3_client, bucket_name, random_flag=True):
             for random_image in random_images:
                 if random_image in images_s3_keys:
                     continue
-                try:
-                    print(f"Checking if {random_image} is archived...")
-                    if is_archived(random_image, s3_client, bucket_name):
-                        if len(images_s3_keys) == 150:
-                            break
-                        else:
-                            images_s3_keys.append(random_image)
+                if is_archived(random_image, s3_client, bucket_name):
+                    if len(images_s3_keys) == 150:
+                        break
                     else:
-                        print(f"{random_image} is not archived.")
-                except Exception as e:
-                    print(f"Error checking {random_image}: {e}")
+                        images_s3_keys.append(random_image)
         else:
             for s3_key in s3_keys:
                 if s3_key in images_s3_keys:
                     continue
-                try:
-                    print(f"Checking if {s3_key} is archived...")
-                    if is_archived(s3_key, s3_client, bucket_name):
-                        images_s3_keys.append(s3_key)
-                        if len(images_s3_keys) == 10:
-                            break
-                    else:
-                        print(f"{s3_key} is not archived.")
-                except Exception as e:
-                    print(f"Error checking {s3_key}: {e}")
+                if is_archived(s3_key, s3_client, bucket_name):
+                    images_s3_keys.append(s3_key)
+                    if len(images_s3_keys) == 10:
+                        break
         curr_dict[image_group_id] = images_s3_keys
         final_dict.update(curr_dict)
     return final_dict
