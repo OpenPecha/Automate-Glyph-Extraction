@@ -2,9 +2,9 @@ import os
 import re
 import random
 from pathlib import Path
-from tools.utils import get_hash, is_archived
+from utils import get_hash, is_archived
 from openpecha.buda.api import get_buda_scan_info, get_image_list
-from tools.config import BDRC_ARCHIVE_BUCKET, bdrc_archive_s3_client
+from config import BDRC_ARCHIVE_BUCKET, bdrc_archive_s3_client
 
 def remove_non_page(images_list, work_id, image_group_id):
     s3_keys = []
