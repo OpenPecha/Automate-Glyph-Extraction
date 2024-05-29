@@ -1,10 +1,9 @@
-import os
-import re
 import random
 from pathlib import Path
 from utils import get_hash, is_archived
 from openpecha.buda.api import get_buda_scan_info, get_image_list
 from config import BDRC_ARCHIVE_BUCKET as bucket_name, bdrc_archive_s3_client as s3_client
+from ocr_pipeline import ocr_images
 
 def remove_non_page(images_list, work_id, image_group_id):
     s3_keys = []
@@ -92,6 +91,8 @@ def main():
             download_and_save_image(bucket_name, images_dict, save_path)
         else:
             print(f"No images found for work_id: {work_id}")
-
+    input_img_dir = Path("../data/images")       
+    ocr_images(input_img_dir)
+    
 if __name__ == "__main__":
     main()
