@@ -1,13 +1,14 @@
-import os
 import io
+import os
 import botocore
 import shutil
-import github_utils
+from tools import github_utils
 from PIL import Image as PillowImage, ImageOps
 from pathlib import Path
 import hashlib
 from PIL import Image, ImageOps, ImageFilter
 # from wand.image import Image as WandImage
+
 
 def publish_repo(local_repo):
     token = "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"
@@ -18,15 +19,17 @@ def publish_repo(local_repo):
         org="MonlamAI",
         token=token,
         description=local_repo.name
-       )
+    )
+
 
 def create_repo_folders(parent_dir, glyph_dirs, filename, num):
     glyph_names = ""
-    
+
     glyph_dir_name = []
     repo_name = f"F{num:04}"
-    glyph_names = list(Path(f"./data/{filename}").read_text(encoding='utf-8').split("\n"))
-    
+    glyph_names = list(
+        Path(f"./data/{filename}").read_text(encoding='utf-8').split("\n"))
+
     for glyph_dir in glyph_dirs:
         if glyph_dir.name in glyph_names:
             continue
@@ -42,12 +45,15 @@ def create_repo_folders(parent_dir, glyph_dirs, filename, num):
             shutil.copytree(glyph_dir, dest_dir)
             glyph_names.append(glyph_dir.name)
             print(f"Copied {glyph_dir} to {dest_dir}")
-    Path(Path(f"./{filename}")).write_text("\n".join(glyph_names), encoding='utf-8')
+    Path(Path(f"./{filename}")
+         ).write_text("\n".join(glyph_names), encoding='utf-8')
+
 
 def get_hash(work_id):
     md5 = hashlib.md5(str.encode(work_id))
     two = md5.hexdigest()[:2]
     return two
+
 
 def get_image_name_for_sentence_image(source_image_path, joined_box):
     image_name = source_image_path.stem
@@ -80,7 +86,8 @@ def crop_and_resize(source_image_path, vertices, expand_percentage=4, greyscale=
     expanded_right = min(right + expand_amount, image.width)
     expanded_bottom = min(bottom + expand_amount, image.height)
 
-    expanded_image = image.crop((expanded_left, expanded_top, expanded_right, expanded_bottom))
+    expanded_image = image.crop(
+        (expanded_left, expanded_top, expanded_right, expanded_bottom))
     new_vertices = f"{expanded_left}, {expanded_top}, {expanded_right}, {expanded_bottom}"
     if expanded_image.width <= 0 or expanded_image.height <= 0:
         return None, None
@@ -110,6 +117,8 @@ def crop_and_resize(source_image_path, vertices, expand_percentage=4, greyscale=
 #    return expanded_image
 
 # used for tengyur pecing
+
+
 def pre_process_image(filepath):
     filename = filepath.split("/")[-1]
     glyph = filename.split("_")[0]
@@ -133,14 +142,14 @@ def pre_process_image(filepath):
 #     filename = os.path.basename(filepath)
 #     glyph = filename.split("_")[0]
 #     output_dir = f"./data/glyphs/{glyph}"
-    
+
 #     # Check if output directory exists and if not, create it
 #     if not os.path.exists(output_dir):
 #         os.makedirs(output_dir)
-    
+
 #     # Read the image
 #     img = cv2.imread(filepath)
-    
+
 #     # Auto contrast adjustment
 #     lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
 #     l, a, b = cv2.split(lab)
@@ -148,13 +157,13 @@ def pre_process_image(filepath):
 #     cl = clahe.apply(l)
 #     limg = cv2.merge((cl, a, b))
 #     img = cv2.cvtColor(limg, cv2.COLOR_LAB2BGR)
-    
+
 #     # Convert to grayscale
 #     img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    
+
 #     # Thresholding to convert the image to black and white
 #     _, img_bw = cv2.threshold(img_gray, 128, 255, cv2.THRESH_BINARY)
-    
+
 #     # Save the image as PNG
 #     base_filename = os.path.splitext(filename)[0]
 #     output_file_path = f"{output_dir}/{base_filename}.png"
@@ -165,9 +174,11 @@ def list_obj_keys(prefix, s3_client, bucket_name):
     continuation_token = None
     while True:
         if continuation_token:
-            response = s3_client.list_objects_v2(Bucket=bucket_name, Prefix=prefix, ContinuationToken=continuation_token)
+            response = s3_client.list_objects_v2(
+                Bucket=bucket_name, Prefix=prefix, ContinuationToken=continuation_token)
         else:
-            response = s3_client.list_objects_v2(Bucket=bucket_name, Prefix=prefix)
+            response = s3_client.list_objects_v2(
+                Bucket=bucket_name, Prefix=prefix)
         if response['Contents']:
             for obj in response['Contents']:
                 obj_key = obj['Key']
@@ -175,7 +186,7 @@ def list_obj_keys(prefix, s3_client, bucket_name):
         continuation_token = response.get("NextContinuationToken")
         if not continuation_token:
             break
-        
+
     return obj_keys
 
 
@@ -186,7 +197,6 @@ def get_s3_bits(s3_key, s3_bucket):
         return filebits
     except botocore.exceptions.ClientError as error:
         return
-
 
 
 def _binarize(img, th=127):
@@ -207,13 +217,14 @@ def save_image(bits, filename, output_path):
         img.save(str(output_fn))
     except:
         return
-    
+
 
 def save_file(bits, filename, output_path):
     output_fn = output_path / filename
     if output_fn.is_file():
         return
     output_fn.write_bytes(bits.getvalue())
+
 
 def is_archived(s3_key, s3_client, Bucket):
     try:
