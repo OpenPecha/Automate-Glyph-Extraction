@@ -4,9 +4,9 @@ import configparser
 import boto3
 import random
 from pathlib import Path
-from tools.utils import get_hash, is_archived
+from utils import get_hash, is_archived
 from openpecha.buda.api import get_buda_scan_info, get_image_list
-from tools.config import BDRC_ARCHIVE_BUCKET as bucket_name, bdrc_archive_s3_client as s3_client
+from config import BDRC_ARCHIVE_BUCKET as bucket_name, bdrc_archive_s3_client as s3_client
 
 BDRC_ARCHIVE_BUCKET = "archive.tbrc.org"
 
