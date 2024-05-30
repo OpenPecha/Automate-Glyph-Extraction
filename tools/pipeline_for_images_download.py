@@ -1,4 +1,5 @@
 import random
+import re
 from pathlib import Path
 from utils import get_hash, is_archived
 from openpecha.buda.api import get_buda_scan_info, get_image_list
@@ -8,6 +9,8 @@ from ocr_pipeline import ocr_images
 def remove_non_page(images_list, work_id, image_group_id):
     s3_keys = []
     hash_two = get_hash(work_id)
+    if bool(re.match(r"[A-Z]", image_group_id[1:])) == False:
+        image_group_id = image_group_id[1:]
     for image in images_list:
         if int(image['filename'].split(".")[-0][-3:]) <= 5:
             continue
