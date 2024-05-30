@@ -95,7 +95,7 @@ def main():
         else:
             print(f"No images found for work_id: {work_id}")
             
-    input_img_dir = Path("../data/images/derge/test")       
+    input_img_dir = Path(save_path)       
     ocr_images(input_img_dir)
     
 if __name__ == "__main__":
