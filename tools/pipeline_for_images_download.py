@@ -1,5 +1,4 @@
 import random
-import re
 from pathlib import Path
 from utils import get_hash, is_archived
 from openpecha.buda.api import get_buda_scan_info, get_image_list
@@ -9,8 +8,6 @@ from ocr_pipeline import ocr_images
 def remove_non_page(images_list, work_id, image_group_id):
     s3_keys = []
     hash_two = get_hash(work_id)
-    if bool(re.match(r"[A-Z]", image_group_id[1:])) == False:
-        image_group_id = image_group_id[1:]
     for image in images_list:
         if int(image['filename'].split(".")[-0][-3:]) <= 5:
             continue
@@ -83,10 +80,10 @@ def download_and_save_image(bucket_name, obj_dict, save_path):
                 print(f"Error downloading {obj_key}: {e}")
 
 def main():
-    work_ids = Path("../data/work_ids/derge_works.txt").read_text(encoding='utf-8').split("\n")
+    work_ids = Path("../data/work_ids/test_derge_works.txt").read_text(encoding='utf-8').split("\n")
     for work_id in work_ids:
         print(f"Processing work_id: {work_id}")
-        save_path = Path(f'../data/images/derge/{work_id}')
+        save_path = Path(f'../data/images/derge/test/{work_id}')
         save_path.mkdir(exist_ok=True, parents=True)
         images_dict = get_random_images(work_id, s3_client, bucket_name, random_flag=True)
         if images_dict:
@@ -95,7 +92,7 @@ def main():
         else:
             print(f"No images found for work_id: {work_id}")
             
-    input_img_dir = Path("../data/images/derge")       
+    input_img_dir = Path("../data/images/derge/test")       
     ocr_images(input_img_dir)
     
 if __name__ == "__main__":
