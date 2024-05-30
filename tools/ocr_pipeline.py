@@ -59,9 +59,10 @@ def apply_ocr_on_image(image_path, OCR_dir, lang=None):
     result = json.dumps(result)
     gzip_result = gzip_str(result)
     result_fn.write_bytes(gzip_result)
+    print(f"OCR completed and saved for image: {image_path}")
 
 def ocr_images(images_dir):
-    OCR_output_path = Path("../data/ocr_json") / images_dir.name
+    OCR_output_path = Path("../data/ocr_json/derge") / images_dir.name
     OCR_output_path.mkdir(parents=True, exist_ok=True)
     for img_fn in list(images_dir.iterdir()):
         if img_fn.suffix.lower() == ".tiff" or img_fn.suffix.lower() == ".tif":
