@@ -9,9 +9,11 @@ from google.cloud.vision import AnnotateImageResponse
 
 vision_client = vision.ImageAnnotatorClient()
 
+
 def check_google_credentials():
     if "GOOGLE_APPLICATION_CREDENTIALS" not in os.environ:
         raise EnvironmentError("set the GAC environment variable.")
+
 
 def google_ocr(image, lang_hint=None):
     check_google_credentials()
@@ -39,6 +41,7 @@ def google_ocr(image, lang_hint=None):
     response = json.loads(response_json)
     return response
 
+
 def gzip_str(string_):
     out = io.BytesIO()
     with gzip.GzipFile(fileobj=out, mode="w") as fo:
@@ -46,11 +49,12 @@ def gzip_str(string_):
     bytes_obj = out.getvalue()
     return bytes_obj
 
+
 def apply_ocr_on_image(image_path, OCR_dir, lang=None):
     image_name = image_path.stem
     result_fn = OCR_dir / f"{image_name}.json.gz"
     if result_fn.is_file():
-        return 
+        return
     try:
         result = google_ocr(str(image_path), lang_hint=lang)
     except Exception as e:
@@ -60,6 +64,7 @@ def apply_ocr_on_image(image_path, OCR_dir, lang=None):
     gzip_result = gzip_str(result)
     result_fn.write_bytes(gzip_result)
     print(f"OCR completed and saved for image: {image_path}")
+
 
 def ocr_images(images_dir):
     OCR_output_path = Path("../data/ocr_json/derge") / images_dir.name
