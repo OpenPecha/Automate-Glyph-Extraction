@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "Automated-Glyph-Cropping"
+version = "0.0.1"
+authors = [
+  { name="OpenPecha", email="dev@openpecha.org" },
+]
+description = "Automated Glyph Cropping for Tibetan Texts"
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+  "pillow>=10.1.0",
+  "RDFlib>=7.0.0",
+  "GitPython>=3.1.37",
+  "requests>=2.31.0",
+  "botocore>=1.33.2",
+  "boto3>=1.33.2",
+  "jsonlines>=4.0.0",
+  "pyewts>=0.2.0",
+  "botok>=0.8.12",
+  "Levenshtein>=0.24.0",
+  "pytesseract>=0.3.10",
+  "bdrc-images-and-ocr-downloader @ git+https://github.com/OpenPecha/bdrc-images-and-ocr-downloader@main"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "pre-commit",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/OpenPecha/openpecha-project-template"
+"Bug Tracker" = "https://github.com/OpenPecha/openpecha-project-template/issues"
