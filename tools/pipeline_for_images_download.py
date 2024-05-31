@@ -32,8 +32,10 @@ def get_random_images(work_id, s3_client, bucket_name, random_flag=True):
         images_s3_keys = []
         images_list = get_image_list(work_id, image_group_id)
         s3_keys = remove_non_page(images_list, work_id, image_group_id)
+
         if random_flag:
-            random_images = list(random.sample(s3_keys, 200))
+            num_samples = min(200, len(s3_keys))
+            random_images = list(random.sample(s3_keys, num_samples))
             for random_image in random_images:
                 if random_image in images_s3_keys:
                     continue
