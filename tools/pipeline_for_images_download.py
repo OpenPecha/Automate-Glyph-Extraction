@@ -85,10 +85,10 @@ def download_and_save_image(bucket_name, obj_dict, save_path):
                 print(f"Error downloading {obj_key}: {e}")
 
 def main():
-    work_ids = Path("../data/work_ids/test_derge_works.txt").read_text(encoding='utf-8').split("\n")
+    work_ids = Path("../data/work_ids/derge_works.txt").read_text(encoding='utf-8').split("\n")
     for work_id in work_ids:
         print(f"Processing work_id: {work_id}")
-        save_path = Path(f'../data/images/derge/test/{work_id}')
+        save_path = Path(f'../data/images/derge/{work_id}')
         save_path.mkdir(exist_ok=True, parents=True)
         images_dict = get_random_images(work_id, s3_client, bucket_name, random_flag=True)
         if images_dict:
