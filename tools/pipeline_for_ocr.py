@@ -67,14 +67,31 @@ def apply_ocr_on_image(image_path, OCR_dir, lang=None):
 
 
 def ocr_images(images_dir):
-    OCR_output_path = Path("../data/ocr_jso/derge") / images_dir.name
-    OCR_output_path.mkdir(parents=True, exist_ok=True)
-    for img_fn in list(images_dir.iterdir()):
-        if img_fn.suffix.lower() == ".tiff" or img_fn.suffix.lower() == ".tif":
-            image_type = "tiff"
-        elif img_fn.suffix.lower() == ".jpg" or img_fn.suffix.lower() == ".jpeg":
-            image_type = "jpeg"
-        else:
-            logging.warning(f"Unsupported image format: {img_fn.name}")
+    OCR_output_root = Path("../data/ocr_jso/derge")
+    OCR_output_root.mkdir(parents=True, exist_ok=True)
+
+    for sub_dir in images_dir.iterdir():
+        if not sub_dir.is_dir():
             continue
-        apply_ocr_on_image(img_fn, OCR_output_path, lang=image_type)
+
+        OCR_output_path = OCR_output_root / sub_dir.name
+        OCR_output_path.mkdir(parents=True, exist_ok=True)
+
+        for img_fn in sub_dir.iterdir():
+            if img_fn.is_file():
+                if img_fn.suffix.lower() in [".tiff", ".tif", ".jpg", ".jpeg"]:
+                    image_type = img_fn.suffix.lower()[1:]
+                    apply_ocr_on_image(img_fn, OCR_output_path, lang=image_type)
+                else:
+                    logging.warning(f"Unsupported image format: {img_fn.name}")
+            else:
+                logging.warning(f"{img_fn.name} is not a file, skipping.")
+
+
+def main():
+    images_dir = Path("../data/images/derge")
+    ocr_images(images_dir)
+
+
+if __name__ == "__main__":
+    main()
