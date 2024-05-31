@@ -67,7 +67,7 @@ def apply_ocr_on_image(image_path, OCR_dir, lang=None):
 
 
 def ocr_images(images_dir):
-    OCR_output_root = Path("../data/ocr_jso/derge")
+    OCR_output_root = Path("../data/ocr_json/derge")
     OCR_output_root.mkdir(parents=True, exist_ok=True)
 
     for sub_dir in images_dir.iterdir():
@@ -81,7 +81,8 @@ def ocr_images(images_dir):
             if img_fn.is_file():
                 if img_fn.suffix.lower() in [".tiff", ".tif", ".jpg", ".jpeg"]:
                     image_type = img_fn.suffix.lower()[1:]
-                    apply_ocr_on_image(img_fn, OCR_output_path, lang=image_type)
+                    apply_ocr_on_image(
+                        img_fn, OCR_output_path, lang=image_type)
                 else:
                     logging.warning(f"Unsupported image format: {img_fn.name}")
             else:
