@@ -9,16 +9,22 @@ from pipeline_for_ocr import ocr_images
 def remove_non_page(images_list, work_id, image_group_id):
     s3_keys = []
     hash_two = get_hash(work_id)
-    if image_group_id[2:4].isalpha():
-        pass
-    else:
+
+    if not image_group_id[2:4].isalpha():
         image_group_id = image_group_id[1:]
+
     for image in images_list:
-        if int(image['filename'].split(".")[-0][-3:]) <= 5:
-            continue
+        filename_part = image['filename'].split(".")[0][-3:]
+
+        if filename_part.isdigit():
+            if int(filename_part) <= 5:
+                continue
         else:
-            s3_key = f"Works/{hash_two}/{work_id}/images/{work_id}-{image_group_id}/{image['filename']}"
-            s3_keys.append(s3_key)
+            continue
+
+        s3_key = f"Works/{hash_two}/{work_id}/images/{work_id}-{image_group_id}/{image['filename']}"
+        s3_keys.append(s3_key)
+
     return s3_keys
 
 
