@@ -10,20 +10,15 @@ def remove_non_page(images_list, work_id, image_group_id):
     s3_keys = []
     hash_two = get_hash(work_id)
 
-    if not image_group_id[2:4].isalpha():
+    if not (image_group_id[2].isalpha() or image_group_id[3].isalpha()):
         image_group_id = image_group_id[1:]
 
     for image in images_list:
         filename_part = image['filename'].split(".")[0][-3:]
 
-        if filename_part.isdigit():
-            if int(filename_part) <= 5:
-                continue
-        else:
-            continue
-
-        s3_key = f"Works/{hash_two}/{work_id}/images/{work_id}-{image_group_id}/{image['filename']}"
-        s3_keys.append(s3_key)
+        if filename_part.isdigit() and int(filename_part) > 5:
+            s3_key = f"Works/{hash_two}/{work_id}/images/{work_id}-{image_group_id}/{image['filename']}"
+            s3_keys.append(s3_key)
 
     return s3_keys
 
@@ -112,6 +107,7 @@ def main():
             print(f"No images found for work_id: {work_id}")
 
     input_img_dir = Path(save_path)
+
     ocr_images(input_img_dir)
 
 

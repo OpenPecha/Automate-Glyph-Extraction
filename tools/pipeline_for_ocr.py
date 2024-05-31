@@ -67,7 +67,7 @@ def apply_ocr_on_image(image_path, OCR_dir, lang=None):
 
 
 def ocr_images(images_dir):
-    OCR_output_path = Path("../data/ocr_json/derge") / images_dir.name
+    OCR_output_path = Path("../data/ocr_jso/derge") / images_dir.name
     OCR_output_path.mkdir(parents=True, exist_ok=True)
     for img_fn in list(images_dir.iterdir()):
         if img_fn.suffix.lower() == ".tiff" or img_fn.suffix.lower() == ".tif":
