@@ -92,10 +92,10 @@ def download_and_save_image(bucket_name, obj_dict, save_path):
 
 def main():
     work_ids = Path(
-        "../data/work_ids/derge_works.txt").read_text(encoding='utf-8').split("\n")
+        "../data/work_ids/pecing_works.txt").read_text(encoding='utf-8').split("\n")
     for work_id in work_ids:
         print(f"Processing work_id: {work_id}")
-        save_path = Path(f'../data/images/derge/{work_id}')
+        save_path = Path(f'../data/images/pecing/{work_id}')
         save_path.mkdir(exist_ok=True, parents=True)
         images_dict = get_random_images(
             work_id, s3_client, bucket_name, random_flag=True)
