@@ -47,11 +47,13 @@ def get_source_image_path(ocr_path, source_img_path):
     for image_path in source_img_path.iterdir():
         if filename == image_path.stem:
             return image_path
-
+        
 def update_csv(cropped_image_path, vertices, image_path, work_id):
     csv_path = CSV_DIR / f"{work_id}_glyphs.csv"
     with csv_path.open("a", encoding='utf-8') as f:
         f.write(f"{cropped_image_path.name}, {image_path}, {vertices}\n")
+    print(f"lyph saved: {cropped_image_path}")
+
 
 def extract_symbols(ocr_paths, source_img_path, present_list, required_glyph_list, work_id, all_found_glyphs):
     for ocr_path in ocr_paths:
@@ -80,13 +82,13 @@ def extract_symbols(ocr_paths, source_img_path, present_list, required_glyph_lis
                 update_csv(cropped_image_path, new_vertices,
                            source_image_path, work_id)
 
+
 def main():
     required_glyph_list = GLYPH_LIST_PATH.read_text(encoding='utf-8').strip().split("\n")
     present_list = PRESENT_LIST_PATH.read_text(encoding='utf-8').strip().split("\n")
     all_found_glyphs = []
 
-    work_id_folders = [
-        folder.name for folder in SOURCE_IMAGES_DIR.iterdir() if folder.is_dir()]
+    work_id_folders = [folder.name for folder in SOURCE_IMAGES_DIR.iterdir() if folder.is_dir()]
 
     for work_id_folder in work_id_folders:
         source_img_path = SOURCE_IMAGES_DIR / work_id_folder
