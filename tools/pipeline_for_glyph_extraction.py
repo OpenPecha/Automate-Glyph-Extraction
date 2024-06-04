@@ -3,12 +3,12 @@ import gzip
 from pathlib import Path
 from utils import crop_and_resize
 
-GLYPH_LIST_PATH = Path("../data/Tibetan_Essential_Glyphs.txt")
-PRESENT_LIST_PATH = Path("../data/present_list/derge_present_list.txt")
-SOURCE_IMAGES_DIR = Path("../data/source_images/derge")
-OCR_JSON_DIR = Path("../data/ocr_json/derge")
+essential_list_path = Path("../data/Tibetan_Essential_Glyphs.txt")
+present_list_path = Path("../data/present_list/derge_present_list.txt")
+source_image_dir = Path("../data/source_images/derge")
+ocr_json_dir = Path("../data/ocr_json/derge")
 OUTPUT_GLYPHS_DIR = Path("../data/glyphs/derge")
-CSV_DIR = Path("../data/csv/derge")
+csv_dir = Path("../data/csv/derge")
 
 
 def get_bounding_poly_for_symbol(ocr_path):
@@ -49,10 +49,10 @@ def get_source_image_path(ocr_path, source_img_path):
             return image_path
         
 def update_csv(cropped_image_path, vertices, image_path, work_id):
-    csv_path = CSV_DIR / f"{work_id}_glyphs.csv"
+    csv_path = csv_dir / f"{work_id}_glyphs.csv"
     with csv_path.open("a", encoding='utf-8') as f:
         f.write(f"{cropped_image_path.name}, {image_path}, {vertices}\n")
-    print(f"lyph saved: {cropped_image_path}")
+    print(f"glyph saved: {cropped_image_path}")
 
 
 def extract_symbols(ocr_paths, source_img_path, present_list, required_glyph_list, work_id, all_found_glyphs):
@@ -84,15 +84,15 @@ def extract_symbols(ocr_paths, source_img_path, present_list, required_glyph_lis
 
 
 def main():
-    required_glyph_list = GLYPH_LIST_PATH.read_text(encoding='utf-8').strip().split("\n")
-    present_list = PRESENT_LIST_PATH.read_text(encoding='utf-8').strip().split("\n")
+    required_glyph_list = essential_list_path.read_text(encoding='utf-8').strip().split("\n")
+    present_list = present_list_path.read_text(encoding='utf-8').strip().split("\n")
     all_found_glyphs = []
 
-    work_id_folders = [folder.name for folder in SOURCE_IMAGES_DIR.iterdir() if folder.is_dir()]
+    work_id_folders = [folder.name for folder in source_image_dir.iterdir() if folder.is_dir()]
 
     for work_id_folder in work_id_folders:
-        source_img_path = SOURCE_IMAGES_DIR / work_id_folder
-        ocr_dir = OCR_JSON_DIR / work_id_folder
+        source_img_path = source_image_dir / work_id_folder
+        ocr_dir = ocr_json_dir / work_id_folder
         ocr_paths = list(ocr_dir.glob("*.json.gz"))
         extract_symbols(ocr_paths, source_img_path, present_list,required_glyph_list, work_id_folder, all_found_glyphs)
 

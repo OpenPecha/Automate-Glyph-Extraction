@@ -75,6 +75,11 @@ def ocr_images(images_dir):
             continue
 
         OCR_output_path = OCR_output_root / sub_dir.name
+
+        if OCR_output_path.exists():
+            print(f"skipped alredy exists in OCR output: {sub_dir.name}")
+            continue
+
         OCR_output_path.mkdir(parents=True, exist_ok=True)
 
         for img_fn in sub_dir.iterdir():
