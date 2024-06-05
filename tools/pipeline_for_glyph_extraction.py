@@ -7,7 +7,7 @@ essential_list_path = Path("../data/Tibetan_Essential_Glyphs.txt")
 present_list_path = Path("../data/present_list/derge_present_list.txt")
 source_image_dir = Path("../data/source_images/derge")
 ocr_json_dir = Path("../data/ocr_json/derge")
-OUTPUT_GLYPHS_DIR = Path("../data/glyphs/derge")
+output_glyph_dir = Path("../data/glyphs/derge")
 csv_dir = Path("../data/csv/derge")
 
 
@@ -67,7 +67,7 @@ def extract_symbols(ocr_paths, source_img_path, present_list, required_glyph_lis
             if text not in all_found_glyphs:
                 all_found_glyphs.append(text)
 
-            output_path = OUTPUT_GLYPHS_DIR / text
+            output_path = output_glyph_dir / text
             output_path.mkdir(parents=True, exist_ok=True)
 
             image_name = get_image_name(output_path, text)
@@ -96,7 +96,7 @@ def main():
         ocr_paths = list(ocr_dir.glob("*.json.gz"))
         extract_symbols(ocr_paths, source_img_path, present_list,required_glyph_list, work_id_folder, all_found_glyphs)
 
-    single_output_file_path = OUTPUT_GLYPHS_DIR / "all_found_glyphs.txt"
+    single_output_file_path = output_glyph_dir / "all_found_glyphs.txt"
     with single_output_file_path.open("w", encoding='utf-8') as file:
         for glyph in all_found_glyphs:
             file.write(f"{glyph}\n")

@@ -61,20 +61,17 @@ def create_repo_for_glyph(file_name, num):
         publish_repo(repo_dir)
 
 
-def publish_unpublished_repos():
-    parent_dir = Path("./data/fonts/")
-    for repo_dir in parent_dir.iterdir():
-        if repo_dir.name in ["F50036", "F50037", "F50038", "F50039", "F50040", "F50041"]:
-            publish_repo(repo_dir)
+# def publish_unpublished_repos():
+#     parent_dir = Path("./data/fonts/")
+#     for repo_dir in parent_dir.iterdir():
+#         if repo_dir.name in ["F50036", "F50037", "F50038", "F50039", "F50040", "F50041"]:
+#             publish_repo(repo_dir)
 
 
 def main():
     num = 50046
-    font_name = "F50000"
-    folder_names = Path(
-        f"./{font_name}.txt").read_text(encoding='utf-8').split("\n")
+    font_name = "F10000"
     file_name = f"{font_name}_glyphs.txt"
-    extract_glyph(folder_names, font_name)
     create_repo_for_glyph(file_name, num)
 
 

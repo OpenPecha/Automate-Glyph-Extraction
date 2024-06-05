@@ -9,11 +9,9 @@ from google.cloud.vision import AnnotateImageResponse
 
 vision_client = vision.ImageAnnotatorClient()
 
-
 def check_google_credentials():
     if "GOOGLE_APPLICATION_CREDENTIALS" not in os.environ:
         raise EnvironmentError("set the GAC environment variable.")
-
 
 def google_ocr(image, lang_hint=None):
     check_google_credentials()
@@ -41,14 +39,12 @@ def google_ocr(image, lang_hint=None):
     response = json.loads(response_json)
     return response
 
-
 def gzip_str(string_):
     out = io.BytesIO()
     with gzip.GzipFile(fileobj=out, mode="w") as fo:
         fo.write(string_.encode())
     bytes_obj = out.getvalue()
     return bytes_obj
-
 
 def apply_ocr_on_image(image_path, OCR_dir, lang=None):
     image_name = image_path.stem
@@ -65,10 +61,11 @@ def apply_ocr_on_image(image_path, OCR_dir, lang=None):
     result_fn.write_bytes(gzip_result)
     print(f"OCR completed and saved for image: {image_path}")
 
-
 def ocr_images(images_dir):
     OCR_output_root = Path("../data/ocr_json/derge")
     OCR_output_root.mkdir(parents=True, exist_ok=True)
+
+    processed_folders = [sub_dir.name for sub_dir in OCR_output_root.iterdir() if sub_dir.is_dir()]
 
     for sub_dir in images_dir.iterdir():
         if not sub_dir.is_dir():
@@ -76,8 +73,8 @@ def ocr_images(images_dir):
 
         OCR_output_path = OCR_output_root / sub_dir.name
 
-        if OCR_output_path.exists():
-            print(f"skipped alredy exists in OCR output: {sub_dir.name}")
+        if sub_dir.name in processed_folders:
+            print(f"skipping already processed folder: {sub_dir}")
             continue
 
         OCR_output_path.mkdir(parents=True, exist_ok=True)
@@ -86,18 +83,15 @@ def ocr_images(images_dir):
             if img_fn.is_file():
                 if img_fn.suffix.lower() in [".tiff", ".tif", ".jpg", ".jpeg"]:
                     image_type = img_fn.suffix.lower()[1:]
-                    apply_ocr_on_image(
-                        img_fn, OCR_output_path, lang=image_type)
+                    apply_ocr_on_image(img_fn, OCR_output_path, lang=image_type)
                 else:
                     logging.warning(f"Unsupported image format: {img_fn.name}")
             else:
                 logging.warning(f"{img_fn.name} is not a file, skipping.")
 
-
 def main():
     images_dir = Path("../data/images/derge")
     ocr_images(images_dir)
-
 
 if __name__ == "__main__":
     main()
