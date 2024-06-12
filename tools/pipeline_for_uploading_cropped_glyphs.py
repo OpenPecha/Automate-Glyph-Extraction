@@ -6,6 +6,7 @@ from github import Github
 
 token = os.environ.get("GITHUB_TOKEN")
 
+
 def create_github_repo(repo_name):
     github_client = Github(token)
     org = github_client.get_organization("MonlamAI")
@@ -16,6 +17,7 @@ def create_github_repo(repo_name):
         print(f"Failed to create GitHub repository {repo_name}: {e}")
         return None
     return repo
+
 
 def publish_repo(local_repo):
     repo_name = local_repo.name
@@ -40,6 +42,7 @@ def publish_repo(local_repo):
     except git.exc.GitCommandError as e:
         print(f"Failed to push repository {repo_name}: {e}")
 
+
 def create_repo_folders(parent_dir, glyph_dirs, filename, font_num):
     glyph_names = []
     repo_dirs = []
@@ -50,7 +53,7 @@ def create_repo_folders(parent_dir, glyph_dirs, filename, font_num):
         if len(list(glyph_dir.iterdir())) == 100:
             if len(repo_dirs) == 10:
                 repo_dirs = []
-                font_num+= 1
+                font_num += 1
                 repo_name = f"F{font_num:04}"
                 current_repo_dir = parent_dir / repo_name
 
@@ -65,22 +68,23 @@ def create_repo_folders(parent_dir, glyph_dirs, filename, font_num):
 
     Path(parent_dir / filename).write_text("\n".join(glyph_names), encoding='utf-8')
 
+
 def create_repo_for_glyph(file_name, font_num):
-    glyph_dirs = list(Path("../data/glyphs/shul").iterdir())
-    parent_dir = Path("../data/batched_glyphs/")
+    glyph_dirs = list(Path("../data/glyphs/derge").iterdir())
+    parent_dir = Path("../data/batched_glyphs/derge")
     parent_dir.mkdir(parents=True, exist_ok=True)
     create_repo_folders(parent_dir, glyph_dirs, file_name, font_num)
     for repo_dir in parent_dir.iterdir():
         if repo_dir.is_dir():
-            repo_num = int(repo_dir.name[1:])
-            if repo_num < 20005:
-                publish_repo(repo_dir)
+            publish_repo(repo_dir)
+
 
 def main():
-    font_num= 20000
-    font_name = "F20000"
+    font_num = 10000
+    font_name = "F10000"
     file_name = f"{font_name}_glyphs.txt"
     create_repo_for_glyph(file_name, font_num)
+
 
 if __name__ == "__main__":
     main()
