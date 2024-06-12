@@ -104,5 +104,3 @@ def main():
     print(f"found glyphs saved at: {single_output_file_path}")
 
 
-if __name__ == "__main__":
-    main()
