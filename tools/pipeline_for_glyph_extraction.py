@@ -31,7 +31,11 @@ def get_bounding_poly_for_symbol(ocr_path):
 
 
 def numerical_sort(file_path):
-    return int(''.join(filter(str.isdigit, str(file_path.stem))))
+    try:
+        return int(''.join(filter(str.isdigit, str(file_path.stem))))
+    except ValueError:
+        return 0  
+
 
 def get_image_name(output_dir, text):
     existing_files = list(output_dir.glob("*.png"))
@@ -43,12 +47,14 @@ def get_image_name(output_dir, text):
         ''.join(filter(str.isdigit, str(last_image_path.stem))))
     return f"{text}_{last_image_number + 1}"
 
+
 def get_source_image_path(ocr_path, source_img_path):
     filename = ocr_path.stem.split(".")[0]
     for image_path in source_img_path.iterdir():
         if filename == image_path.stem:
             return image_path
-        
+
+
 def update_csv(cropped_image_path, vertices, image_path, work_id):
     csv_path = csv_dir / f"{work_id}_glyphs.csv"
     with csv_path.open("a", encoding='utf-8') as f:
@@ -95,17 +101,14 @@ def main():
         source_img_path = source_image_dir / work_id_folder
         ocr_dir = ocr_json_dir / work_id_folder
         ocr_paths = list(ocr_dir.glob("*.json.gz"))
-        extract_symbols(ocr_paths, source_img_path, present_list,required_glyph_list, work_id_folder, all_found_glyphs)
+        extract_symbols(ocr_paths, source_img_path, present_list, required_glyph_list, work_id_folder, all_found_glyphs)
 
     single_output_file_path = found_glyphs_dir / "derge_found_glyphs.txt"
     with single_output_file_path.open("w", encoding='utf-8') as file:
         for glyph in all_found_glyphs:
             file.write(f"{glyph}\n")
     print(f"found glyphs saved at: {single_output_file_path}")
-    
+
 
 if __name__ == "__main__":
     main()
-
-
-
