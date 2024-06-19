@@ -9,8 +9,8 @@ def write_to_file(file_path, content):
 
 def main():
     essential_chars_file = '../data/Tibetan_Essential_Glyphs.txt'  
-    present_chars_file = '../data/font_data/required_list/derge/present_derge_list.txt'
-    output_file = '../data/font_data/required_list/derge/missing_derge_glyphs'  
+    present_chars_file = '../data/derge_present_tibetan_glyphs.txt'
+    output_file = '../data/font_data/required_list/derge/derge_glyphs_missing.txt'  
 
     essential_chars = set(read_file(essential_chars_file))
     present_chars = set(read_file(present_chars_file))

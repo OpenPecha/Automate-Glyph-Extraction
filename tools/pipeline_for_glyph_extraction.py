@@ -5,8 +5,8 @@ from utils import crop_and_resize
 
 essential_list_path = Path("../data/reference_list/Tibetan_Essential_Glyphs.txt")
 present_list_path = Path("../data/reference_list/derge_present_list.txt")
-source_image_dir = Path("../data/source_images/derge")
-ocr_json_dir = Path("../data/ocr_json/derge")
+source_image_dir = Path("../data/batch_two/images")
+ocr_json_dir = Path("../data/batch_two/ocr")
 output_glyph_dir = Path("../data/glyphs/derge")
 csv_dir = Path("../data/csv/derge")
 found_glyphs_dir = Path("../data/found_glyphs_list")
@@ -102,5 +102,10 @@ def main():
         for glyph in all_found_glyphs:
             file.write(f"{glyph}\n")
     print(f"found glyphs saved at: {single_output_file_path}")
+    
+
+if __name__ == "__main__":
+    main()
+
 
 
