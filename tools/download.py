@@ -17,7 +17,7 @@ def download_images_from_s3(work_id, json_file, bucket_name, download_dir):
     for entry in data:
         image_group_id = entry['image_group_id']
         
-        # Modify image_group_id if necessary
+       
         if not (image_group_id[2].isalpha() or image_group_id[3].isalpha()):
             image_group_id = image_group_id[1:]
         
