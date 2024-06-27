@@ -21,6 +21,7 @@ def create_s3_key(images_list, work_id, image_group_id):
 
     return s3_keys
 
+
 def get_images_from_references(json_file_path, work_id):
     with open(json_file_path, 'r', encoding='utf-8') as file:
         data = json.load(file)
@@ -51,7 +52,7 @@ def get_specific_images(work_id, s3_client, bucket_name, image_references):
                     if is_archived(s3_key, s3_client, bucket_name):
                         images_s3_keys.append(s3_key)
                 except Exception as e:
-                    pass 
+                    pass
 
         curr_dict[image_group_id] = images_s3_keys
         final_dict.update(curr_dict)
@@ -75,18 +76,20 @@ def download_and_save_image(bucket_name, obj_dict, save_path):
                     f.write(image_data)
                 print(f"Image downloaded and saved as {image_path}")
             except Exception as e:
-                pass  
+                pass
 
 
 def main():
     json_file_path = "span.json"
-    work_ids = Path("../data/work_ids/derge_works.txt").read_text(encoding='utf-8').split("\n")
+    work_ids = Path(
+        "../data/work_ids/derge_works.txt").read_text(encoding='utf-8').split("\n")
     for work_id in work_ids:
-        save_path = Path(f'../data/images/derge/{work_id}')
+        save_path = Path(f'../data/images/derge/required_images/{work_id}')
         save_path.mkdir(exist_ok=True, parents=True)
         image_references = get_images_from_references(json_file_path, work_id)
         if image_references:
-            images_dict = get_specific_images(work_id, s3_client, bucket_name, image_references)
+            images_dict = get_specific_images(
+                work_id, s3_client, bucket_name, image_references)
             if images_dict:
                 print(f"Downloading images for work_id: {work_id}")
                 download_and_save_image(bucket_name, images_dict, save_path)
