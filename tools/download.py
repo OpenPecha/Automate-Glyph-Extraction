@@ -36,9 +36,9 @@ def get_images_from_references(json_file_path, work_id):
 
 def get_specific_images(work_id, s3_client, bucket_name, image_references):
     final_dict = {}
-    curr_dict = {}
     scan_info = get_buda_scan_info(work_id)
     if scan_info is None:
+        print(f"No scan info found for work_id: {work_id}")
         return None
     for image_group_id, _ in scan_info["image_groups"].items():
         images_s3_keys = []
@@ -52,47 +52,51 @@ def get_specific_images(work_id, s3_client, bucket_name, image_references):
                     if is_archived(s3_key, s3_client, bucket_name):
                         images_s3_keys.append(s3_key)
                 except Exception as e:
-                    pass
+                    print(f"Error checking if {s3_key} is archived: {e}")
 
-        curr_dict[image_group_id] = images_s3_keys
-        final_dict.update(curr_dict)
+        if images_s3_keys:
+            final_dict[image_group_id] = images_s3_keys
+
     return final_dict
 
 
 def download_and_save_image(bucket_name, obj_dict, save_path):
     if obj_dict is None:
+        print("No objects to download.")
         return
-    for _, obj_keys in obj_dict.items():
+    for image_group_id, obj_keys in obj_dict.items():
         for obj_key in obj_keys:
             image_name = obj_key.split("/")[-1]
             image_path = Path(f"{save_path}/{image_name}")
             if image_path.exists():
+                print(f"Image {image_name} already exists, skipping download.")
                 continue
             try:
-                response = s3_client.get_object(
-                    Bucket=bucket_name, Key=obj_key)
+                response = s3_client.get_object(Bucket=bucket_name, Key=obj_key)
                 image_data = response['Body'].read()
                 with open(image_path, 'wb') as f:
                     f.write(image_data)
-                print(f"Image downloaded and saved as {image_path}")
+                print(f"Image {image_name} downloaded and saved as {image_path}")
             except Exception as e:
-                pass
+                print(f"Error downloading {obj_key}: {e}")
 
 
 def main():
     json_file_path = "span.json"
-    work_ids = Path(
-        "../data/work_ids/derge_works.txt").read_text(encoding='utf-8').split("\n")
+    work_ids = Path("../data/work_ids/derge_works.txt").read_text(encoding='utf-8').split("\n")
     for work_id in work_ids:
         save_path = Path(f'../data/required_images/derge/{work_id}')
         save_path.mkdir(exist_ok=True, parents=True)
         image_references = get_images_from_references(json_file_path, work_id)
         if image_references:
-            images_dict = get_specific_images(
-                work_id, s3_client, bucket_name, image_references)
+            images_dict = get_specific_images(work_id, s3_client, bucket_name, image_references)
             if images_dict:
                 print(f"Downloading images for work_id: {work_id}")
                 download_and_save_image(bucket_name, images_dict, save_path)
+            else:
+                print(f"No images found for work_id: {work_id}")
+        else:
+            print(f"No image references found for work_id: {work_id}")
 
 
 if __name__ == "__main__":
