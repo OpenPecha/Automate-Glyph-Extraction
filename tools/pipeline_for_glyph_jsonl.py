@@ -31,12 +31,11 @@ def upload_to_s3_and_return_data(repo_path, pub_type, final_jsonl):
             filename = image_path.name
             local_file_path = image_path
             s3_key = f"glyph/shul_test/{pub_type}/{directories.name}/{filename}"
-            s3_url = f"s3://monlam.ai.ocr/{s3_key}"
 
             with open(local_file_path, "rb") as image_file:
                 s3_client.upload_fileobj(image_file, bucket_name, s3_key)
             final_jsonl.append(
-                {"id": filename, "image_url": s3_url, "text": directories.name})
+                {"id": filename, "image_url": s3_key, "text": directories.name})
             print(f"{filename} uploaded to S3")
         done_glyphs += directories.name + "\n"
     print("All files uploaded to S3")
