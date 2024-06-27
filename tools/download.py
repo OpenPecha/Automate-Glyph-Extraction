@@ -24,14 +24,10 @@ def download_images_from_s3(work_id, json_file, bucket_name, download_dir):
         for image_filename in entry['references']:
             s3_key = f"Works/{hash_two}/{work_id}/images/{work_id}-{image_group_id}/{image_filename}"
         
-            try:
-                download_path = Path(download_dir) / f"{work_id}-{image_group_id}-{image_filename}"
-                download_path.parent.mkdir(parents=True, exist_ok=True)
-                
-                s3.download_file(bucket_name, s3_key, str(download_path))
-                print(f"Downloaded {s3_key} to {download_path}")
-            except Exception as e:
-                print(f"Failed to download {s3_key}: {e}")
+            download_path = Path(download_dir) / f"{work_id}" / image_filename
+            download_path.parent.mkdir(parents=True, exist_ok=True)
+            s3.download_file(bucket_name, s3_key, str(download_path))
+           
 
 def main():
     work_id = "W22084"
