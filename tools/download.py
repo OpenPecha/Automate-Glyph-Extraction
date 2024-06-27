@@ -84,7 +84,7 @@ def main():
     work_ids = Path(
         "../data/work_ids/derge_works.txt").read_text(encoding='utf-8').split("\n")
     for work_id in work_ids:
-        save_path = Path(f'../data/images/derge/required_images/{work_id}')
+        save_path = Path(f'../data/required_images/derge/{work_id}')
         save_path.mkdir(exist_ok=True, parents=True)
         image_references = get_images_from_references(json_file_path, work_id)
         if image_references:
