@@ -30,7 +30,7 @@ def upload_to_s3_and_return_data(repo_path, pub_type, final_jsonl):
         for image_path in directories.iterdir():
             filename = image_path.name
             local_file_path = image_path
-            s3_key = f"glyph/shul_test/{pub_type}/{directories.name}/{filename}"
+            s3_key = f"glyph/batch_2/{pub_type}/{directories.name}/{filename}"
 
             with open(local_file_path, "rb") as image_file:
                 s3_client.upload_fileobj(image_file, bucket_name, s3_key)
@@ -39,7 +39,7 @@ def upload_to_s3_and_return_data(repo_path, pub_type, final_jsonl):
             print(f"{filename} uploaded to S3")
         done_glyphs += directories.name + "\n"
     print("All files uploaded to S3")
-    with open('../data/done_list_for_s3/F20000_done_glyphs.txt', 'w', encoding='utf-8') as file:
+    with open('../data/done_list_for_s3/F10000_done_glyphs.txt', 'w', encoding='utf-8') as file:
         file.write(done_glyphs)
     return final_jsonl, done_glyphs
 
@@ -86,7 +86,7 @@ def on_rm_error(func, path, exc_info):
 
 def main(repo_start, repo_end, pub_type):
     final_jsonl = []
-    for num in range(repo_start, repo_end):
+    for num in range(repo_start, repo_end + 1):
         repo_name = f"F{num:04}"
         cloned_repo_path = clone_repo(repo_name)
         final_jsonl, _ = upload_to_s3_and_return_data(
@@ -94,12 +94,12 @@ def main(repo_start, repo_end, pub_type):
         shutil.rmtree(cloned_repo_path, onerror=on_rm_error)
         print(f"Repo {repo_name} is done")
 
-    jsonl_path = Path(f"../data/jsonl/{repo_name}.jsonl")
+    jsonl_path = Path(f"../data/jsonl/F10000.jsonl")
     write_jsonl(final_jsonl, jsonl_path)
 
-    csv_input_path = Path(f"../data/csv/shul")
+    csv_input_path = Path(f"../data/csv/derge")
     get_coordinates(csv_input_path, jsonl_path, f"{repo_name}_coordinates.csv")
 
 
 if __name__ == "__main__":
-    main(20000, 20001, "shul")
+    main(10000, 10006, "derge")
