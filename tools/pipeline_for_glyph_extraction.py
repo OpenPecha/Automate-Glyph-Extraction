@@ -4,11 +4,11 @@ from pathlib import Path
 from utils import crop_and_resize
 
 essential_list_path = Path("../data/reference_list/Tibetan_Essential_Glyphs.txt")
-present_list_path = Path("../data/reference_list/derge_present_list.txt")
-source_image_dir = Path("../data/batch_two/images")
-ocr_json_dir = Path("../data/batch_two/ocr")
-output_glyph_dir = Path("../data/glyphs/derge")
-csv_dir = Path("../data/csv/derge")
+present_list_path = Path("../data/reference_list/pecing_present_list.txt")
+source_image_dir = Path("../data/source_images/pecing")
+ocr_json_dir = Path("../data/ocr_json/pecing")
+output_glyph_dir = Path("../data/glyphs/pecing")
+csv_dir = Path("../data/csv/pecing")
 found_glyphs_dir = Path("../data/found_glyphs_list")
 
 
@@ -103,7 +103,7 @@ def main():
         ocr_paths = list(ocr_dir.glob("*.json.gz"))
         extract_symbols(ocr_paths, source_img_path, present_list, required_glyph_list, work_id_folder, all_found_glyphs)
 
-    single_output_file_path = found_glyphs_dir / "derge_found_glyphs.txt"
+    single_output_file_path = found_glyphs_dir / "pecing_found_glyphs.txt"
     with single_output_file_path.open("w", encoding='utf-8') as file:
         for glyph in all_found_glyphs:
             file.write(f"{glyph}\n")
