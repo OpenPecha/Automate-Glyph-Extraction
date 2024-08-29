@@ -16,11 +16,11 @@ def remove_non_page(images_list, work_id, image_group_id):
         filename_part = image['filename'].split(".")[0][-3:]
 
         if filename_part.isdigit() and int(filename_part) > 5:
-            s3_key = f"Works/{hash_two}/{work_id}/images/{
-                work_id}-{image_group_id}/{image['filename']}"
+            s3_key = f"Works/{hash_two}/{work_id}/images/{work_id}-{image_group_id}/{image['filename']}"
             s3_keys.append(s3_key)
 
     return s3_keys
+
 
 
 def get_random_images(work_id, s3_client, bucket_name, random_flag=True):
