@@ -1,44 +1,34 @@
-import csv
+import configparser
 import os
 import boto3
 
-MONLAM_AI_OCR_BUCKET = "monlam.ai.ocr"
+BDRC_ARCHIVE_BUCKET = "archive.tbrc.org"
 
-aws_credentials_file = os.path.join(
-    os.getenv('USERPROFILE'), '.aws', 'credential', 'tenkal_accessKeys.csv')
-aws_access_key_id = None
-aws_secret_access_key = None
+aws_credentials_file = os.path.expanduser("~/.aws/credentials")
 
-try:
-    with open(aws_credentials_file, 'r', encoding='utf-8-sig') as csv_file:
-        csv_reader = csv.DictReader(csv_file)
-        for row in csv_reader:
-            aws_access_key_id = row.get('Access key ID')
-            aws_secret_access_key = row.get('Secret access key')
-            if aws_access_key_id and aws_secret_access_key:
-                break
-        else:
-            raise ValueError("no aws credential in csv")
+config = configparser.ConfigParser()
+config.read(aws_credentials_file)
 
-except FileNotFoundError:
-    print("csv not found.")
+
+if "archive_tbrc_org" not in config:
+    print("Error: 'archive_tbrc_org' section not found in AWS credentials file.")
     exit(1)
-except Exception as e:
-    print("error while reading the csv:", e)
+
+if "aws_access_key_id" not in config["archive_tbrc_org"]:
+    print("Error: 'aws_access_key_id' not found in 'archive_tbrc_org' section.")
     exit(1)
-try:
-    monlam_ai_ocr_session = boto3.Session(
-        aws_access_key_id=aws_access_key_id,
-        aws_secret_access_key=aws_secret_access_key
-    )
-except Exception as e:
-    print("error while creating Boto3 session:", e)
+
+if "aws_secret_access_key" not in config["archive_tbrc_org"]:
+    print("Error: 'aws_secret_access_key' not found in 'archive_tbrc_org' section.")
     exit(1)
-try:
-    monlam_ai_ocr_s3_client = monlam_ai_ocr_session .client('s3')
-    monlam_ai_ocr_s3_resource = monlam_ai_ocr_session.resource('s3')
-    monlam_ai_ocr_bucket = monlam_ai_ocr_s3_resource.Bucket(
-        MONLAM_AI_OCR_BUCKET)
-except Exception as e:
-    print("error while creating S3 resource objects:", e)
-    exit(1)
+
+bdrc_archive_session = boto3.Session(
+    aws_access_key_id=config["archive_tbrc_org"]["aws_access_key_id"],
+    aws_secret_access_key=config["archive_tbrc_org"]["aws_secret_access_key"]
+)
+
+bdrc_archive_s3_client = bdrc_archive_session.client('s3')
+bdrc_archive_s3_resource = bdrc_archive_session.resource('s3')
+
+bdrc_archive_bucket = bdrc_archive_s3_resource.Bucket(BDRC_ARCHIVE_BUCKET)
+ocr_output_bucket = bdrc_archive_s3_resource.Bucket("ocr.bdrc.io")
