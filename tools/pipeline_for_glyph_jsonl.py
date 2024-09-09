@@ -4,7 +4,7 @@ import shutil
 import csv
 from git import Repo
 from pathlib import Path
-from config import MONLAM_AI_OCR_BUCKET, monlam_ai_ocr_s3_client
+from local_config import MONLAM_AI_OCR_BUCKET, monlam_ai_ocr_s3_client
 import stat
 
 s3_client = monlam_ai_ocr_s3_client
@@ -39,7 +39,7 @@ def upload_to_s3_and_return_data(repo_path, pub_type, final_jsonl):
             print(f"{filename} uploaded to S3")
         done_glyphs += directories.name + "\n"
     print("All files uploaded to S3")
-    with open('../data/done_list_for_s3/F10000_done_glyphs.txt', 'w', encoding='utf-8') as file:
+    with open('data/done_list_for_s3/F70000_done_glyphs.txt', 'w', encoding='utf-8') as file:
         file.write(done_glyphs)
     return final_jsonl, done_glyphs
 
@@ -94,12 +94,12 @@ def main(repo_start, repo_end, pub_type):
         shutil.rmtree(cloned_repo_path, onerror=on_rm_error)
         print(f"Repo {repo_name} is done")
 
-    jsonl_path = Path(f"../data/jsonl/F10000.jsonl")
+    jsonl_path = Path(f"data/jsonl/F70000.jsonl")
     write_jsonl(final_jsonl, jsonl_path)
 
-    csv_input_path = Path(f"../data/csv/derge")
+    csv_input_path = Path(f"data/csv/shul")
     get_coordinates(csv_input_path, jsonl_path, f"{repo_name}_coordinates.csv")
 
 
 if __name__ == "__main__":
-    main(10000, 10006, "derge")
+    main(70000, 70045, "shul")

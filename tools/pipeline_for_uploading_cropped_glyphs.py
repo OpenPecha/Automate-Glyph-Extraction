@@ -41,7 +41,7 @@ def publish_repo(local_repo, dir_names):
         print(f"Failed to push repository {repo_name}: {e}")
 
     
-    found_glyph_list = local_repo / "all_glyphs_F2.txt"
+    found_glyph_list = local_repo / "all_glyphs_F7.txt"
     with open(found_glyph_list, "w", encoding="utf-8") as f:
         for name in dir_names:
             f.write(f"{name}\n")
@@ -78,8 +78,8 @@ def create_repo_folders(parent_dir, glyph_dirs, font_num):
     return glyph_names, all_dir_names
 
 def create_repo_for_glyph(font_num):
-    glyph_dirs = list(Path("data/glyphs/pecing").iterdir())
-    parent_dir = Path("data/batched_glyphs/pecing")
+    glyph_dirs = list(Path("data/glyphs/shul").iterdir())
+    parent_dir = Path("data/batched_glyphs/shul")
     parent_dir.mkdir(parents=True, exist_ok=True)
     glyph_names, all_dir_names = create_repo_folders(parent_dir, glyph_dirs, font_num)
     for repo_dir in parent_dir.iterdir():
@@ -87,7 +87,7 @@ def create_repo_for_glyph(font_num):
             publish_repo(repo_dir, all_dir_names)
 
 def main():
-    font_num = 60000
+    font_num = 70000
     create_repo_for_glyph(font_num)
 
 if __name__ == "__main__":
