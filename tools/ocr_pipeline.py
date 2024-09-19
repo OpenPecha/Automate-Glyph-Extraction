@@ -62,7 +62,7 @@ def apply_ocr_on_image(image_path, OCR_dir, lang=None):
     print(f"OCR completed and saved for image: {image_path}")
 
 def ocr_images(images_dir):
-    OCR_output_root = Path("../data/ocr_json/pecing")
+    OCR_output_root = Path("../data/ocr_json/drepung")
     OCR_output_root.mkdir(parents=True, exist_ok=True)
 
     processed_folders = [sub_dir.name for sub_dir in OCR_output_root.iterdir() if sub_dir.is_dir()]
@@ -90,7 +90,7 @@ def ocr_images(images_dir):
                 logging.warning(f"{img_fn.name} is not a file, skipping.")
 
 def main():
-    images_dir = Path("../data/source_images/pecing")
+    images_dir = Path("../data/source_images/drepung")
     ocr_images(images_dir)
 
 if __name__ == "__main__":
